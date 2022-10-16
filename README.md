@@ -1,7 +1,7 @@
 # Experimental d-FuzzStream: Dispersion-Based Fuzzy Data Stream Clustering
 
 Implementation of the fuzzy data stream clustering algorithm from the article [d-FuzzStream: A Dispersion-Based Fuzzy Data Stream Clustering](https://ieeexplore.ieee.org/document/8491534).
-Original Python implementation, as well as, additional information can be found in this [repo]().
+Original Python implementation, as well as, additional information can be found in this [repo](https://github.com/Xicks/d-FuzzStream).
 
 This implementation facilitates experiments over the original implementation because of the following aspects:
 * Allows different functions to be used when calculating distance, membership and merge. 
@@ -36,7 +36,7 @@ To run examples and generate graphics:
 Follow the original implementation steps with the addition of three parameters:
 * *distance_function* (default: euclidean distance) -> function to calculate distance between two values.
 * *membership_function* (default: fuzzy c-means membership) -> function that distances and calculate memberships.
-* *merge_function (default: fuzzy dissimilarity)* -> function to calculate and merge summary structures
+* *merge_function* (default: fuzzy dissimilarity) -> function to calculate and merge summary structures
 
 All options have default values.
 
