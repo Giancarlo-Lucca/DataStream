@@ -4,16 +4,17 @@ import numpy as np
 
 
 class FuzzyDissimilarityMerger:
-    def __init__(self, sm = 1):
+    def __init__(self, sm):
         self.similMatrix = np.zeros((5, 5, 2))
         self.sm = 2
+        print("sm depois = "+str(sm))
 
     def merge(self, fmics, threshold, memberships):
         fmics_to_merge = []
         
         for i in range(0, len(fmics) - 1):
             for j in range(i + 1, len(fmics)):
-                if (sm == 1):
+                if (self.sm == 1):
                     dissimilarity = EuclideanDistance.distance(fmics[i].center, fmics[j].center)
                     sum_of_radius = fmics[i].radius + fmics[j].radius
                     if dissimilarity != 0:

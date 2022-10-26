@@ -13,7 +13,8 @@ from functions.membership import FuzzyCMeansMembership
 
 summarizer = DFuzzStreamSummarizer(
     distance_function=EuclideanDistance.distance,
-    merge_function=FuzzyDissimilarityMerger.merge,
+    #merge_function=FuzzyDissimilarityMerger.merge,
+    merge_function=FuzzyDissimilarityMerger(2).merge,
     membership_function=FuzzyCMeansMembership.memberships
 )
 
