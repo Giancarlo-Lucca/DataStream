@@ -15,7 +15,7 @@ class DFuzzStreamSummarizer:
             m=2.0,
             distance_function=distance.EuclideanDistance.distance,
             membership_function=membership.FuzzyCMeansMembership.memberships,
-            merge_function=merge.FuzzyDissimilarityMerger.merge
+            merge_function=merge.FuzzyDissimilarityMerger(2).merge
     ):
         self.min_fmics = min_fmics
         self.max_fmics = max_fmics
@@ -68,7 +68,7 @@ class DFuzzStreamSummarizer:
             self.metrics['absorptions'] += 1
 
         number_of_fmics = len(self.__fmics)
-        self.__fmics = self.__merge_function(self.__fmics, self.merge_threshold)
+        self.__fmics = self.__merge_function(self.__fmics, self.merge_threshold, self.__memberships)
         self.metrics['merges'] += number_of_fmics - len(self.__fmics)
 
     def summary(self):

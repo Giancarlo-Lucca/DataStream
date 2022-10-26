@@ -1,4 +1,10 @@
 import pandas as pd
+
+import os, sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+
 from d_fuzzstream import DFuzzStreamSummarizer
 from functions.merge import FuzzyDissimilarityMerger
 from functions.distance import EuclideanDistance

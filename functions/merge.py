@@ -4,25 +4,30 @@ import numpy as np
 
 
 class FuzzyDissimilarityMerger:
+    def __init__(self, sm = 1):
+        self.similMatrix = np.zeros((5, 5, 2))
+        self.sm = 2
 
-    def merge(fmics, threshold):
+    def merge(self, fmics, threshold, memberships):
         fmics_to_merge = []
-        similMatrix = np.zeros((5,5,2))
-
         
         for i in range(0, len(fmics) - 1):
             for j in range(i + 1, len(fmics)):
-                similMatrix[i, j, 0] += np.minimum(fmics[i].__memberships, fmics[j].__memberships)      
+                if (sm == 1):
+                    dissimilarity = EuclideanDistance.distance(fmics[i].center, fmics[j].center)
+                    sum_of_radius = fmics[i].radius + fmics[j].radius
+                    if dissimilarity != 0:
+                        similarity = sum_of_radius / dissimilarity
+                    else:
+                        # Highest value possible
+                        similarity = 1.7976931348623157e+308
 
-                dissimilarity = EuclideanDistance.distance(fmics[i].center, fmics[j].center)
-                sum_of_radius = fmics[i].radius + fmics[j].radius
-
-                if dissimilarity != 0:
-                    similarity = sum_of_radius / dissimilarity
-                else:
-                    # Highest value possible
-                    similarity = 1.7976931348623157e+308
-
+                elif (self.sm == 2):
+                    self.similMatrix[i, j, 0] += np.minimum(memberships[i], memberships[j])
+                    self.similMatrix[i, j, 1] += np.maximum(memberships[i], memberships[j])
+                    similarity = self.similMatrix[i, j, 0] / self.similMatrix[i, j, 1]
+                
+                
                 if similarity >= threshold:
                     fmics_to_merge.append([i, j, similarity])
 
