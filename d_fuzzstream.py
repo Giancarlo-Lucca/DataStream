@@ -23,6 +23,7 @@ class DFuzzStreamSummarizer:
         self.radius_factor = radius_factor
         self.m = m
         self.__fmics = []
+        self.__memberships = []  #membership degree of the new point to all FMics
         self.__distance_function = distance_function
         self.__membership_function = membership_function
         self.__merge_function = merge_function
@@ -61,6 +62,7 @@ class DFuzzStreamSummarizer:
             self.metrics['creations'] += 1
         else:
             memberships = self.__membership_function(distance_from_fmics, self.m)
+            self.__memberships = memberships
             for idx, fmic in enumerate(self.__fmics):
                 fmic.assign(values, tag, memberships[idx], distance_from_fmics[idx])
             self.metrics['absorptions'] += 1

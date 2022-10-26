@@ -1,14 +1,19 @@
 from fmic import FMiC
 from functions.distance import EuclideanDistance
+import numpy as np
 
 
 class FuzzyDissimilarityMerger:
 
     def merge(fmics, threshold):
         fmics_to_merge = []
+        similMatrix = np.zeros((5,5,2))
 
+        
         for i in range(0, len(fmics) - 1):
             for j in range(i + 1, len(fmics)):
+                similMatrix[i, j, 0] += np.minimum(fmics[i].__memberships, fmics[j].__memberships)      
+
                 dissimilarity = EuclideanDistance.distance(fmics[i].center, fmics[j].center)
                 sum_of_radius = fmics[i].radius + fmics[j].radius
 
