@@ -4,13 +4,13 @@ import numpy as np
 
 
 class FuzzyDissimilarityMerger:
-    def __init__(self, sm = 1):
+    def __init__(self):
         self.similMatrix = np.zeros((5, 5, 2))
-        self.sm = 2
+        #self._sm = 2
 
-    def merge(self, fmics, threshold, memberships):
+    def merge(self, fmics, threshold, memberships, sm):
         fmics_to_merge = []
-        
+        print(sm)
         for i in range(0, len(fmics) - 1):
             for j in range(i + 1, len(fmics)):
                 if (sm == 1):
@@ -22,7 +22,7 @@ class FuzzyDissimilarityMerger:
                         # Highest value possible
                         similarity = 1.7976931348623157e+308
 
-                elif (self.sm == 2):
+                elif (sm == 2):
                     self.similMatrix[i, j, 0] += np.minimum(memberships[i], memberships[j])
                     self.similMatrix[i, j, 1] += np.maximum(memberships[i], memberships[j])
                     similarity = self.similMatrix[i, j, 0] / self.similMatrix[i, j, 1]
