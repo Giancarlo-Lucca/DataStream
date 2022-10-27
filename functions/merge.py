@@ -4,8 +4,9 @@ import numpy as np
 
 
 class FuzzyDissimilarityMerger:
-    def __init__(self, sm):
-        self.similMatrix = np.zeros((5, 5, 2))
+    def __init__(self, sm, max_fmics):
+        self.similMatrix = np.zeros((max_fmics, max_fmics, 2))
+        #self.similMatrix.flat[0::6] = 1
         self.sm = 2
         print("sm depois = "+str(sm))
 
