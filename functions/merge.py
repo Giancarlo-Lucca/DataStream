@@ -7,13 +7,18 @@ class FuzzyDissimilarityMerger:
     def __init__(self):
         self.similMatrix = np.zeros((5, 5, 2))
         #self._sm = 2
+    def __init__(self, sm, max_fmics):
+        self.similMatrix = np.zeros((max_fmics, max_fmics, 2))
+        #self.similMatrix.flat[0::6] = 1
+        self.sm = 2
+        print("sm depois = "+str(sm))
 
     def merge(self, fmics, threshold, memberships, sm):
         fmics_to_merge = []
         print(sm)
         for i in range(0, len(fmics) - 1):
             for j in range(i + 1, len(fmics)):
-                if (sm == 1):
+                if (self.sm == 1):
                     dissimilarity = EuclideanDistance.distance(fmics[i].center, fmics[j].center)
                     sum_of_radius = fmics[i].radius + fmics[j].radius
                     if dissimilarity != 0:
