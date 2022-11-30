@@ -51,6 +51,7 @@ class FuzzyDissimilarityMerger:
                     min = np.minimum(memberships[i], memberships[j])
                     self.similMatrix[i, j, 0] = np.maximum(self.similMatrix[i, j, 0], min)
                     similarity = self.similMatrix[i, j, 0]
+                    #print(similarity)
 
                     
                 #S(A,B) = G(O(x_1,y_1), ... O(x_n, y_n))
@@ -71,6 +72,7 @@ class FuzzyDissimilarityMerger:
                     ODiv = np.sqrt(memberships[i] * memberships[j])    
                 
                 if similarity >= threshold:
+                    #print("inside threshold")
                     fmics_to_merge.append([i, j, similarity])
 
         # Sort by most similar

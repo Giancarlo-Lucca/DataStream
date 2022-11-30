@@ -10,7 +10,7 @@ from functions.merge import FuzzyDissimilarityMerger
 from functions.distance import EuclideanDistance
 from functions.membership import FuzzyCMeansMembership
 
-sm = 2
+sm = 5
 min_fmics = 5
 max_fmics = 100
 
