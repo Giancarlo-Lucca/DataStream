@@ -9,7 +9,7 @@ class FuzzyDissimilarityMerger:
         #self.similMatrix.flat[0::6] = 1
         self.sm = sm
 
-    def merge(self, fmics, threshold, memberships, sm):
+    def merge(self, fmics, threshold, memberships):
         fmics_to_merge = []
         for i in range(0, len(fmics) - 1):
             for j in range(i + 1, len(fmics)):
