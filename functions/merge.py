@@ -9,7 +9,7 @@ class FuzzyDissimilarityMerger:
         #self.similMatrix.flat[0::6] = 1
         self.sm = sm
 
-    def merge(self, fmics, threshold, memberships, sm):
+    def merge(self, fmics, threshold, memberships):
         fmics_to_merge = []
         for i in range(0, len(fmics) - 1):
             for j in range(i + 1, len(fmics)):
@@ -39,7 +39,6 @@ class FuzzyDissimilarityMerger:
                 #S(A,B) = G(O(x_1,y_1), ... O(x_n, y_n))
                 # O = product   #G = probabilistic sum -> x1 + x2 − x1 · x2
                 elif(self.sm == 4):
-                    print("in -- 4")
                     overlap = memberships[i] * memberships[j]                      
                     self.similMatrix[i, j, 0] = self.similMatrix[i, j, 0] + overlap - self.similMatrix[i, j, 0] * overlap 
                     similarity = self.similMatrix[i, j, 0]

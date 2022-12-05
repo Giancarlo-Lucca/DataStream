@@ -10,7 +10,7 @@ from functions.merge import FuzzyDissimilarityMerger
 from functions.distance import EuclideanDistance
 from functions.membership import FuzzyCMeansMembership
 
-sm = 2
+sm = 5
 min_fmics = 5
 max_fmics = 100
 
@@ -20,7 +20,6 @@ summarizer = DFuzzStreamSummarizer(
     #merge_function=FuzzyDissimilarityMerger.merge,
     merge_function=FuzzyDissimilarityMerger(sm, max_fmics).merge,
     membership_function=FuzzyCMeansMembership.memberships,
-    sm = sm
 )
 
 summary = {'x': [], 'y': [], 'weight': [], 'class': []}
