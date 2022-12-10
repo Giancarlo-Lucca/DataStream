@@ -88,8 +88,6 @@ class FuzzyDissimilarityMerger:
                     min = np.minimum(memberships[i], memberships[j])
                     self.similMatrix[i, j, 0] = np.maximum(self.similMatrix[i, j, 0], min)
                     similarity = self.similMatrix[i, j, 0]
-                    if similarity > 0.6:
-                        print(similarity)
 
                 #O = GM
                 elif(self.sm == 11):                     
@@ -102,9 +100,6 @@ class FuzzyDissimilarityMerger:
                     OB = np.sqrt((memberships[i] * memberships[j]) * np.minimum( memberships[i], memberships[j]))
                     self.similMatrix[i, j, 0] = np.maximum(self.similMatrix[i, j, 0], OB)
                     similarity = self.similMatrix[i, j, 0]
-                    if similarity > 0.5:
-                        print(similarity)
-
 
                 #O = ODiv
                 elif(self.sm == 13):                     
@@ -118,44 +113,34 @@ class FuzzyDissimilarityMerger:
                 #================================================================================================================================
                 #O = Product
                 elif(self.sm == 14):
-                    Prod = memberships[i] * memberships[j]                      
-                    #self.similMatrix[i, j, 0] = self.similMatrix[i, j, 0] + Prod - self.similMatrix[i, j, 0] * Prod 
+                    Prod = memberships[i] * memberships[j]
+                    #GM                      
+                    self.auxMatrix[i, j, 0] += 1 - np.power((1 -  memberships[i]) * (1- memberships[j]), 1/2)
+                    #n
                     self.similMatrix[i, j, 1] += 1
-                    #self.similMatrix[i, j, 0] = 1 - np.power(1 - np.sqrt(memberships[i] * memberships[j]), self.similMatrix[i, j, 1]) * np.power(1 - Prod, 1/self.similMatrix[i, j, 1]+1)
-                    self.similMatrix[i, j, 0] = 1 - np.power(1 - np.sqrt(self.similMatrix[i, j, 0] * Prod), self.similMatrix[i, j, 1]) * np.power(1 - Prod, 1/self.similMatrix[i, j, 1]+1)
+                    #similarity
+                    self.similMatrix[i, j, 0] = 1 - np.power(np.power(1 - self.auxMatrix[i, j, 0], self.similMatrix[i, j, 1]) * (1 - Prod), 1/self.similMatrix[i, j, 1]+1)
                     similarity = self.similMatrix[i, j, 0]
-                
+
                 #O = MIN
                 elif(self.sm == 15):                     
                     min = np.minimum(memberships[i], memberships[j])
                     self.similMatrix[i, j, 1] += 1
-                                        #self.similMatrix[i, j, 0] = 1 - np.power(1 - np.sqrt(memberships[i] * memberships[j]), self.similMatrix[i, j, 1]) * np.power(1 - min, 1/self.similMatrix[i, j, 1]+1)
-                    self.similMatrix[i, j, 0] = 1 - np.power(1 - np.sqrt(self.similMatrix[i, j, 0] * min), self.similMatrix[i, j, 1]) * np.power(1 - min, 1/self.similMatrix[i, j, 1]+1)
-                    similarity = self.similMatrix[i, j, 0]   
 
                 #O = GM
                 elif(self.sm == 16):                     
                     GM = np.sqrt(memberships[i] * memberships[j])
                     self.similMatrix[i, j, 1] += 1
-                                        #self.similMatrix[i, j, 0] = 1 - np.power(1 - np.sqrt(memberships[i] * memberships[j]), self.similMatrix[i, j, 1]) * np.power(1 - GM, 1/self.similMatrix[i, j, 1]+1)
-                    self.similMatrix[i, j, 0] = 1 - np.power(1 - np.sqrt(self.similMatrix[i, j, 0] * GM), self.similMatrix[i, j, 1]) * np.power(1 - GM, 1/self.similMatrix[i, j, 1]+1)
-                    similarity = self.similMatrix[i, j, 0]
 
                 #O = OB
                 elif(self.sm == 17):                     
                     OB = np.sqrt((memberships[i] * memberships[j]) * np.minimum( memberships[i], memberships[j]))
                     self.similMatrix[i, j, 1] += 1
-                                        #self.similMatrix[i, j, 0] = 1 - np.power(1 - np.sqrt(memberships[i] * memberships[j]), self.similMatrix[i, j, 1]) * np.power(1 - OB, 1/self.similMatrix[i, j, 1]+1)
-                    self.similMatrix[i, j, 0] = 1 - np.power(1 - np.sqrt(self.similMatrix[i, j, 0] * OB), self.similMatrix[i, j, 1]) * np.power(1 - OB, 1/self.similMatrix[i, j, 1]+1)
-                    similarity = self.similMatrix[i, j, 0]
 
                 #O = ODiv
                 elif(self.sm == 18):                     
                     ODiv = (memberships[i] * memberships[j] + np.minimum(memberships[i], memberships[j]))/2 
                     self.similMatrix[i, j, 1] += 1
-                                        #self.similMatrix[i, j, 0] = 1 - np.power(1 - np.sqrt(memberships[i] * memberships[j]), self.similMatrix[i, j, 1]) * np.power(1 - ODiv, 1/self.similMatrix[i, j, 1]+1)
-                    self.similMatrix[i, j, 0] = 1 - np.power(1 - np.sqrt(self.similMatrix[i, j, 0] * ODiv), self.similMatrix[i, j, 1]) * np.power(1 - ODiv, 1/self.similMatrix[i, j, 1]+1)
-                    similarity = self.similMatrix[i, j, 0]                    
 
                 #================================================================================================================================
                             #S(A,B) = G(O(x_1,y_1), ... O(x_n, y_n))    -> G = Dual(OB) (idx 19 to 13)
