@@ -1,14 +1,34 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
+
+import os, sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+
 from d_fuzzstream import DFuzzStreamSummarizer
+from functions.merge import FuzzyDissimilarityMerger
+from functions.distance import EuclideanDistance
+from functions.membership import FuzzyCMeansMembership
+
+idxSimilarity = 5
+min_fmics = 5
+max_fmics = 100
+thresh = 1.2
 
 
-summarizer = DFuzzStreamSummarizer()
 
-chunk_size = 100
+summarizer = DFuzzStreamSummarizer(
+    distance_function=EuclideanDistance.distance,
+    merge_threshold = thresh,
+    merge_function=FuzzyDissimilarityMerger(idxSimilarity, max_fmics).merge,
+    membership_function=FuzzyCMeansMembership.memberships,
+)
+
+chunk_size = 1000
 figure = plt.figure()
-scatter = plt.scatter('x', 'y', s='radius', data={'x': [], 'y': []})
+scatter = plt.scatter('x', 'y', s='radius', data={'x': [], 'y': [], 'radius': []})
 
 # Read files in chunks
 csv = pd.read_csv("https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/Bench1_11k/Benchmark1_11000.csv",
@@ -57,7 +77,7 @@ anim = FuncAnimation(
 
 writer_gif = PillowWriter(fps=60)
 
-anim.save("summary.gif", writer=writer_gif)
+anim.save("summary_sm_"+str(idxSimilarity)+"th_"+str(thresh)+".gif", writer=writer_gif)
 
 plt.close()
 csv.close()
