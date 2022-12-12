@@ -11,19 +11,19 @@ from functions.distance import EuclideanDistance
 from functions.membership import FuzzyCMeansMembership
 
 
-sm = 13
+sm = 1
 min_fmics = 5
 max_fmics = 100
 thresh = 0.5
-threshList = [0.5, 0.65, 0.8, 0.95]
-
+#threshList = [0.5, 0.65, 0.8, 0.95]
+threshList = [0.95]
 
 for simIDX in range (1, sm+1):
     for threshIDX in threshList:
         summarizer = DFuzzStreamSummarizer(
             distance_function=EuclideanDistance.distance,
             merge_threshold = threshIDX,
-            merge_function=FuzzyDissimilarityMerger(simIDX, max_fmics).merge,
+            merge_function=FuzzyDissimilarityMerger(14, max_fmics).merge,
             membership_function=FuzzyCMeansMembership.memberships,
         )
 
