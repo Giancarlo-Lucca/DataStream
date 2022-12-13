@@ -116,12 +116,15 @@ class FuzzyDissimilarityMerger:
                 elif(self.sm == 14):
                     Prod = memberships[i] * memberships[j]
                     #GM                      
-                    self.auxMatrix[i, j, 0] += 1 - np.power((1 -  memberships[i]) * (1- memberships[j]), 1/2)
-                    #n
+                    if (self.similMatrix[i, j, 1] == 0):
+                        # n = 1
+                        self.similMatrix[i, j, 0] = 1 - np.power((1 -  memberships[i]) * (1- memberships[j]), 1/2)
+                    else:
+                        # n
+                        #similarity
+                        self.similMatrix[i, j, 0] = 1 - np.power(np.power(1 - self.similMatrix[i, j, 0], self.similMatrix[i, j, 1]) * (1 - Prod), 1/self.similMatrix[i, j, 1]+1)
                     self.similMatrix[i, j, 1] += 1
-                    #similarity
-                    similarity = 1 - np.power(np.power(1 - self.auxMatrix[i, j, 0], self.similMatrix[i, j, 1]) * (1 - Prod), 1/self.similMatrix[i, j, 1]+1)
-                    
+                    similarity = self.similMatrix[i, j, 0]
 
 
                 #O = MIN
