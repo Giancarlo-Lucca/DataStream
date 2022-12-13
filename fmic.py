@@ -1,5 +1,5 @@
 from math import sqrt
-
+import numpy as np
 
 class FMiC:
 
@@ -12,6 +12,9 @@ class FMiC:
         self.center = cf.copy()
         self.radius = 0.0
 
+        self.mSquare = 0.0
+        self.mLog = 0.0
+
         if tag:
             self.tags = {str(tag): 1.0}
         else:
@@ -21,6 +24,10 @@ class FMiC:
         self.m += membership
         self.n += 1
         self.ssd += membership * pow(distance, 2)
+
+
+        self.mSquare += membership **2
+        self.mLog += membership * np.log(membership)        
 
         for idx, value in enumerate(values):
             self.cf[idx] += value * membership

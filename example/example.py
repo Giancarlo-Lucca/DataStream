@@ -17,14 +17,17 @@ max_fmics = 100
 thresh = 0.5
 #threshList = [0.5, 0.65, 0.8, 0.95]
 threshList = [0.95]
+chunksize=1000
+
 
 for simIDX in range (1, sm+1):
     for threshIDX in threshList:
         summarizer = DFuzzStreamSummarizer(
             distance_function=EuclideanDistance.distance,
             merge_threshold = threshIDX,
-            merge_function=FuzzyDissimilarityMerger(14, max_fmics).merge,
+            merge_function=FuzzyDissimilarityMerger(5, max_fmics).merge,
             membership_function=FuzzyCMeansMembership.memberships,
+            chunksize = chunksize
         )
 
         summary = {'x': [], 'y': [], 'weight': [], 'class': []}
@@ -33,9 +36,14 @@ for simIDX in range (1, sm+1):
         # Read files in chunks
         with pd.read_csv("https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/Bench1_11k/Benchmark1_11000.csv",
                         dtype={"X1": float, "X2": float, "class": str},
-                        chunksize=1000) as reader:       
+                        chunksize = chunksize) as reader:       
             for chunk in reader:
                 print(f"Summarizing examples from {timestamp} to {timestamp + 999} -> sim {simIDX} and thrsh {threshIDX}")
+                print("Purity: " )
+                print("Partition Coeficient:")
+                print("Entropy: "+str(summarizer.PartitionEntropy()))
+                print("Xie Benie:\n")
+
                 for index, example in chunk.iterrows():
                     #Summarizing example
                     summarizer.summarize(example[0:2], example[2], timestamp)
@@ -64,7 +72,7 @@ for simIDX in range (1, sm+1):
         output = output + str("\n ==== Metrics ====")
         output = output + str("\n "+str(summarizer.metrics))
         output = output + str("\n *** \n")
-
+ 
         with open('directOUTPUT.txt', 'a') as f:
             f.write(output)
     with open('directOUTPUT.txt', 'a') as f:
