@@ -16,7 +16,8 @@ class DFuzzStreamSummarizer:
             distance_function=distance.EuclideanDistance.distance,
             membership_function=membership.FuzzyCMeansMembership.memberships,
             #merge_function=merge.FuzzyDissimilarityMerger.merge
-            merge_function=merge.FuzzyDissimilarityMerger(1, 100).merge
+            merge_function=merge.FuzzyDissimilarityMerger(1, 100).merge,
+            chunksize = 1000
     ):
         self.min_fmics = min_fmics
         self.max_fmics = max_fmics
@@ -29,6 +30,8 @@ class DFuzzStreamSummarizer:
         self.__membership_function = membership_function
         self.__merge_function = merge_function
         self.metrics = {'creations': 0, 'absorptions': 0, 'removals': 0, 'merges': 0}
+        self.chunksize = chunksize
+        
 
     def summarize(self, values, tag, timestamp):
         if len(self.__fmics) < self.min_fmics:
@@ -72,5 +75,14 @@ class DFuzzStreamSummarizer:
             self.__fmics = self.__merge_function(self.__fmics, self.merge_threshold, self.__memberships)
             self.metrics['merges'] += number_of_fmics - len(self.__fmics)
 
+
+    def PartitionEntropy(self):
+        mLog = 0
+        for idxFMIC, fmic in enumerate(self.__fmics):
+            mLog += fmic.mLog
+            
+        partEntropy = - 1/self.chunksize * mLog
+        
+        return partEntropy
     def summary(self):
         return self.__fmics.copy()
