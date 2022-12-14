@@ -83,14 +83,14 @@ class DFuzzStreamSummarizer:
         for idxFMIC, fmic in enumerate(self.__fmics):
             majorityClass += np.max(fmic.sumPointsPerClass)
             totalPoints += np.sum(fmic.sumPointsPerClass)
-        return (1/self.chunksize * majorityClass)
+        return (1/totalPoints * majorityClass)
 
     def PartitionCoefficient(self):
         mSquare = 0
         for idxFMIC, fmic in enumerate(self.__fmics):
             mSquare += fmic.mSquare
             
-        return (- 1/self.chunksize * mSquare)
+        return (1/self.chunksize * mSquare)
 
     def PartitionEntropy(self):
         mLog = 0
