@@ -31,9 +31,9 @@ class FMiC:
         self.mSquare += membership **2
         self.mLog += membership * np.log(membership)        
 
-        if (tag == 1):
+        if (tag == '1'):
             self.sumPointsPerClass[0] += 1
-        elif(tag == 2):    
+        elif(tag == '2'):    
             self.sumPointsPerClass[1] += 1
         else:
             self.sumPointsPerClass[2] += 1
@@ -55,6 +55,7 @@ class FMiC:
         merged_fmic.ssd = fmic_a.ssd + fmic_b.ssd
         merged_fmic.n = fmic_a.n + fmic_b.n
         merged_fmic.center = fmic_a.center.copy()
+        merged_fmic.sumPointsPerClass = fmic_a.sumPointsPerClass + fmic_b.sumPointsPerClass
 
         merged_fmic.tags = fmic_a.tags
 

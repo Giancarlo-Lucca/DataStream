@@ -79,8 +79,10 @@ class DFuzzStreamSummarizer:
 
     def Purity(self):
         majorityClass = 0
+        totalPoints = 0
         for idxFMIC, fmic in enumerate(self.__fmics):
-            majorityClass += np.maximum(fmic.sumPointsPerClass)
+            majorityClass += np.max(fmic.sumPointsPerClass)
+            totalPoints += np.sum(fmic.sumPointsPerClass)
         return (1/self.chunksize * majorityClass)
 
     def PartitionCoefficient(self):

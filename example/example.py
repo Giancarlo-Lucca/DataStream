@@ -25,7 +25,7 @@ for simIDX in range (1, sm+1):
         summarizer = DFuzzStreamSummarizer(
             distance_function=EuclideanDistance.distance,
             merge_threshold = threshIDX,
-            merge_function=FuzzyDissimilarityMerger(5, max_fmics).merge,
+            merge_function=FuzzyDissimilarityMerger(1, max_fmics).merge,
             membership_function=FuzzyCMeansMembership.memberships,
             chunksize = chunksize
         )
@@ -39,15 +39,16 @@ for simIDX in range (1, sm+1):
                         chunksize = chunksize) as reader:       
             for chunk in reader:
                 print(f"Summarizing examples from {timestamp} to {timestamp + 999} -> sim {simIDX} and thrsh {threshIDX}")
-                print("Purity: " )
-                print("Partition Coeficient:")
-                print("Entropy: "+str(summarizer.PartitionEntropy()))
-                print("Xie Benie:\n")
 
                 for index, example in chunk.iterrows():
                     #Summarizing example
                     summarizer.summarize(example[0:2], example[2], timestamp)
                     timestamp += 1
+
+                print("Purity: "+str(summarizer.Purity()))
+                print("Partition Coeficient:"+str(summarizer.PartitionCoefficient()))
+                print("Entropy: "+str(summarizer.PartitionEntropy()))
+                print("Xie Benie:\n")
 
             # Transforming FMiCs into dataframe
             for fmic in summarizer.summary():
