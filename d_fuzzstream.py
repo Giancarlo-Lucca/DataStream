@@ -76,13 +76,25 @@ class DFuzzStreamSummarizer:
             self.metrics['merges'] += number_of_fmics - len(self.__fmics)
 
 
+    def Purity(sef):
+        print("to be implemented")
+
+    def PartitionCoefficient(self):
+        mSquare = 0
+        for idxFMIC, fmic in enumerate(self.__fmics):
+            mSquare += fmic.mSquare
+            
+        return (- 1/self.chunksize * mSquare)
+
     def PartitionEntropy(self):
         mLog = 0
         for idxFMIC, fmic in enumerate(self.__fmics):
             mLog += fmic.mLog
             
-        partEntropy = - 1/self.chunksize * mLog
-        
-        return partEntropy
+        return (- 1/self.chunksize * mLog)
+
+    def XieBeni(self):
+        print("to be implemented")
+
     def summary(self):
         return self.__fmics.copy()
