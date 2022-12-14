@@ -2,6 +2,7 @@ from fmic import FMiC
 from functions import distance
 from functions import membership
 from functions import merge
+import numpy as np
 
 
 class DFuzzStreamSummarizer:
@@ -76,8 +77,11 @@ class DFuzzStreamSummarizer:
             self.metrics['merges'] += number_of_fmics - len(self.__fmics)
 
 
-    def Purity(sef):
-        print("to be implemented")
+    def Purity(self):
+        majorityClass = 0
+        for idxFMIC, fmic in enumerate(self.__fmics):
+            majorityClass += np.maximum(fmic.sumPointsPerClass)
+        return (1/self.chunksize * majorityClass)
 
     def PartitionCoefficient(self):
         mSquare = 0
