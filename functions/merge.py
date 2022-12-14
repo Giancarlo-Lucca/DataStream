@@ -231,9 +231,6 @@ class FuzzyDissimilarityMerger:
                 #O = ODiv
                 elif(self.sm == 28):                     
                     ODiv = (memberships[i] * memberships[j] + np.minimum(memberships[i], memberships[j]))/2 
-                
-
-    
 
 
                 if (similarity < 0) | (similarity > 1):

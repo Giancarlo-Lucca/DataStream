@@ -14,6 +14,8 @@ class FMiC:
 
         self.mSquare = 0.0
         self.mLog = 0.0
+        self.sumPointsPerClass = np.zeros(3)
+
 
         if tag:
             self.tags = {str(tag): 1.0}
@@ -28,6 +30,14 @@ class FMiC:
 
         self.mSquare += membership **2
         self.mLog += membership * np.log(membership)        
+
+        if (tag == 1):
+            self.sumPointsPerClass[0] += 1
+        elif(tag == 2):    
+            self.sumPointsPerClass[1] += 1
+        else:
+            self.sumPointsPerClass[2] += 1
+
 
         for idx, value in enumerate(values):
             self.cf[idx] += value * membership
