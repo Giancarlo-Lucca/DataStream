@@ -25,7 +25,7 @@ for simIDX in range (1, sm+1):
         summarizer = DFuzzStreamSummarizer(
             distance_function=EuclideanDistance.distance,
             merge_threshold = threshIDX,
-            merge_function=FuzzyDissimilarityMerger(1, max_fmics).merge,
+            merge_function=FuzzyDissimilarityMerger(14, max_fmics).merge,
             membership_function=FuzzyCMeansMembership.memberships,
             chunksize = chunksize
         )
