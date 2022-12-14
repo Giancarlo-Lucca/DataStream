@@ -233,9 +233,6 @@ class FuzzyDissimilarityMerger:
                     ODiv = (memberships[i] * memberships[j] + np.minimum(memberships[i], memberships[j]))/2 
 
 
-                if (similarity < 0) | (similarity > 1):
-                    print("ESSA PORRA TÀ SAINDO DOS LIMITES")
-                    print("-------------------------------------------------------------")
                 if similarity >= threshold:
                     #print("inside threshold")
                     fmics_to_merge.append([i, j, similarity])
