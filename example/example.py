@@ -27,7 +27,7 @@ for simIDX in range (1, sm+1):
         summarizer = DFuzzStreamSummarizer(
             distance_function=EuclideanDistance.distance,
             merge_threshold = threshIDX,
-            merge_function=FuzzyDissimilarityMerger(14, max_fmics).merge,
+            merge_function=FuzzyDissimilarityMerger(6, max_fmics).merge,
             membership_function=FuzzyCMeansMembership.memberships,
             chunksize = chunksize
         )
@@ -51,10 +51,9 @@ for simIDX in range (1, sm+1):
                 #print("Partition Coeficient:"+str(summarizer.PartitionCoefficient()))
                 #print("Entropy: "+str(summarizer.PartitionEntropy()))
                 #print("Xie Benie:\n")
-                new_row = ["["+str(timestamp)+" to "+str(timestamp + 999)+"]", summarizer.Purity(), summarizer.PartitionCoefficient(), summarizer.PartitionEntropy(), summarizer.XieBeni()]
-                df2 = df.concat(new_row)
-
-            print(df2)
+                
+                new_row = pd.DataFrame([["["+str(timestamp)+" to "+str(timestamp + 999)+"]", summarizer.Purity(), summarizer.PartitionCoefficient(), summarizer.PartitionEntropy(), summarizer.XieBeni()]], columns=df.columns)
+                df = pd.concat([df, new_row], ignore_index=True)
 
             # Transforming FMiCs into dataframe
             for fmic in summarizer.summary():
@@ -71,7 +70,7 @@ for simIDX in range (1, sm+1):
         print("==== Metrics ====")
         print(summarizer.metrics)
         print("\n")
-        print(df2)
+        print(df)
         
         output = "\n==== Approach ===="
         output = output + str("\n Similarity ="+str(simIDX))
@@ -80,12 +79,15 @@ for simIDX in range (1, sm+1):
         output = output + str("\n "+str(summary))
         output = output + str("\n ==== Metrics ====")
         output = output + str("\n "+str(summarizer.metrics))
-        output = output + str("\n *** \n")
- 
-        
+        output = output + str("\n ")
+        output = output + str("\n ==== Evaluation ====")
+        output = output + str("\n "+df.to_markdown(tablefmt='greed'))
+        output = output + str("\n *****")
 
         with open('directOUTPUT.txt', 'a') as f:
             f.write(output)
+
+
     with open('directOUTPUT.txt', 'a') as f:
         f.write("\n------------------------------------------------------------")
 print("--- End of execution --- ")

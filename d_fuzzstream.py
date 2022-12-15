@@ -100,7 +100,17 @@ class DFuzzStreamSummarizer:
         return (- 1/self.chunksize * mLog)
 
     def XieBeni(self):
-        print("to be implemented")
+        sumaSSD = 0
+        centroidList = np.ones((len(self.__fmics), 2))*1000000
+        menorDistancia = 1000000
+        #storing the distances among all Fmics
+        for idxFMIC, fmic in enumerate(self.__fmics):
+            sumaSSD += fmic.ssd 
+            centroidList[idxFMIC, :] = fmic.center
+       
+        MinDist = np.min(np.linalg.norm(centroidList, axis=1))
+                
+        return (1/self.chunksize * sumaSSD)/MinDist
 
     def summary(self):
         return self.__fmics.copy()
