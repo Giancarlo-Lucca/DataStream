@@ -19,10 +19,9 @@ threshList = [0.95]
 chunksize=1000
 
 df = pd.DataFrame(columns = ['Chunk', 'Purity', 'pCoefficient', 'pEntropy', 'XieBeni'])
-new_row = {'Chunk':12, 'Purity':12, 'pCoefficient':12, 'pEntropy':12, 'XieBeni':12}
-df2 = df.append(new_row, ignore_index=True)
-print(df2)
-print('**********************')
+#new_row = {'Chunk':12, 'Purity':12, 'pCoefficient':12, 'pEntropy':12, 'XieBeni':12}
+#df2 = df.append(new_row, ignore_index=True)
+
 for simIDX in range (1, sm+1):
     for threshIDX in threshList:
         summarizer = DFuzzStreamSummarizer(
@@ -48,10 +47,14 @@ for simIDX in range (1, sm+1):
                     summarizer.summarize(example[0:2], example[2], timestamp)
                     timestamp += 1
 
-                print("Purity: "+str(summarizer.Purity()))
-                print("Partition Coeficient:"+str(summarizer.PartitionCoefficient()))
-                print("Entropy: "+str(summarizer.PartitionEntropy()))
-                print("Xie Benie:\n")
+                #print("Purity: "+str(summarizer.Purity()))
+                #print("Partition Coeficient:"+str(summarizer.PartitionCoefficient()))
+                #print("Entropy: "+str(summarizer.PartitionEntropy()))
+                #print("Xie Benie:\n")
+                new_row = ["["+str(timestamp)+" to "+str(timestamp + 999)+"]", summarizer.Purity(), summarizer.PartitionCoefficient(), summarizer.PartitionEntropy(), summarizer.XieBeni()]
+                df2 = df.concat(new_row)
+
+            print(df2)
 
             # Transforming FMiCs into dataframe
             for fmic in summarizer.summary():
@@ -68,6 +71,8 @@ for simIDX in range (1, sm+1):
         print("==== Metrics ====")
         print(summarizer.metrics)
         print("\n")
+        print(df2)
+        
         output = "\n==== Approach ===="
         output = output + str("\n Similarity ="+str(simIDX))
         output = output + str("\n Threshold ="+str(threshIDX))
@@ -77,6 +82,8 @@ for simIDX in range (1, sm+1):
         output = output + str("\n "+str(summarizer.metrics))
         output = output + str("\n *** \n")
  
+        
+
         with open('directOUTPUT.txt', 'a') as f:
             f.write(output)
     with open('directOUTPUT.txt', 'a') as f:
