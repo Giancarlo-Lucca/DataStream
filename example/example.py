@@ -10,24 +10,25 @@ from functions.membership import FuzzyCMeansMembership
 import pandas as pd
 
 
-sm = 1
+sm = 33
 min_fmics = 5
 max_fmics = 100
 thresh = 0.5
-#threshList = [0.5, 0.65, 0.8, 0.95]
-threshList = [0.95]
+#threshList = [0.05, 0.1, 0.5, 0.8, 0.9]
+threshList = [0.95, 1]
 chunksize=1000
 
-df = pd.DataFrame(columns = ['Chunk', 'Purity', 'pCoefficient', 'pEntropy', 'XieBeni'])
+
 #new_row = {'Chunk':12, 'Purity':12, 'pCoefficient':12, 'pEntropy':12, 'XieBeni':12}
 #df2 = df.append(new_row, ignore_index=True)
 
-for simIDX in range (1, sm+1):
+for simIDX in range (10, sm+1):
+    df = pd.DataFrame(columns = ['Chunk', 'Purity', 'pCoefficient', 'pEntropy', 'XieBeni'])
     for threshIDX in threshList:
         summarizer = DFuzzStreamSummarizer(
             distance_function=EuclideanDistance.distance,
             merge_threshold = threshIDX,
-            merge_function=FuzzyDissimilarityMerger(6, max_fmics).merge,
+            merge_function=FuzzyDissimilarityMerger(sm, max_fmics).merge,
             membership_function=FuzzyCMeansMembership.memberships,
             chunksize = chunksize
         )
@@ -47,11 +48,7 @@ for simIDX in range (1, sm+1):
                     summarizer.summarize(example[0:2], example[2], timestamp)
                     timestamp += 1
 
-                #print("Purity: "+str(summarizer.Purity()))
-                #print("Partition Coeficient:"+str(summarizer.PartitionCoefficient()))
-                #print("Entropy: "+str(summarizer.PartitionEntropy()))
-                #print("Xie Benie:\n")
-                
+               
                 new_row = pd.DataFrame([["["+str(timestamp)+" to "+str(timestamp + 999)+"]", summarizer.Purity(), summarizer.PartitionCoefficient(), summarizer.PartitionEntropy(), summarizer.XieBeni()]], columns=df.columns)
                 df = pd.concat([df, new_row], ignore_index=True)
 
@@ -71,6 +68,7 @@ for simIDX in range (1, sm+1):
         print(summarizer.metrics)
         print("\n")
         print(df)
+        print("------")
         
         output = "\n==== Approach ===="
         output = output + str("\n Similarity ="+str(simIDX))
@@ -83,7 +81,7 @@ for simIDX in range (1, sm+1):
         output = output + str("\n ==== Evaluation ====")
         output = output + str("\n "+df.to_markdown(tablefmt='greed'))
         output = output + str("\n *****")
-
+        df.drop(df.index, inplace=True)
         with open('directOUTPUT.txt', 'a') as f:
             f.write(output)
 
