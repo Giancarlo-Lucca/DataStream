@@ -1,5 +1,3 @@
-import pandas as pd
-
 import os, sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
@@ -9,6 +7,7 @@ from d_fuzzstream import DFuzzStreamSummarizer
 from functions.merge import FuzzyDissimilarityMerger
 from functions.distance import EuclideanDistance
 from functions.membership import FuzzyCMeansMembership
+import pandas as pd
 
 
 sm = 1
@@ -19,7 +18,11 @@ thresh = 0.5
 threshList = [0.95]
 chunksize=1000
 
-
+df = pd.DataFrame(columns = ['Chunk', 'Purity', 'pCoefficient', 'pEntropy', 'XieBeni'])
+new_row = {'Chunk':12, 'Purity':12, 'pCoefficient':12, 'pEntropy':12, 'XieBeni':12}
+df2 = df.append(new_row, ignore_index=True)
+print(df2)
+print('**********************')
 for simIDX in range (1, sm+1):
     for threshIDX in threshList:
         summarizer = DFuzzStreamSummarizer(
