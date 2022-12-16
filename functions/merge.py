@@ -40,7 +40,6 @@ class FuzzyDissimilarityMerger:
                     self.similMatrix[i, j, 0] += np.power(1 - np.absolute(memberships[i] - memberships[j]), 1/t)
                     self.similMatrix[i, j, 1] += 1 #NAO È A MÉDIA É O NUMERO DE PONTOS!!!
                     similarity = self.similMatrix[i, j, 0] / self.similMatrix[i, j, 1]
-                    #print(similarity)
 
                 #================================================================================================================================
                             #S(A,B) = G(O(x_1,y_1), ... O(x_n, y_n))    -> G = Probabilistic Sum (idx 4 to 8)
@@ -126,9 +125,7 @@ class FuzzyDissimilarityMerger:
                         self.similMatrix[i, j, 0] = 1 - np.power(self.auxMatrix[i, j, 1] , 1/self.similMatrix[i, j, 1]+1)
                     self.similMatrix[i, j, 1] += 1
                     similarity = self.similMatrix[i, j, 0]
-                    #print(similarity)
  
-
                 #O = MIN
                 elif(self.sm == 15):                     
                     min = np.minimum(memberships[i], memberships[j])                 
@@ -143,6 +140,7 @@ class FuzzyDissimilarityMerger:
                         self.similMatrix[i, j, 0] = 1 - np.power(self.auxMatrix[i, j, 1] , 1/self.similMatrix[i, j, 1]+1)
                     self.similMatrix[i, j, 1] += 1
                     similarity = self.similMatrix[i, j, 0]
+                
                 #O = GM
                 elif(self.sm == 16):                     
                     GM = np.sqrt(memberships[i] * memberships[j])
@@ -190,7 +188,6 @@ class FuzzyDissimilarityMerger:
 
                 #================================================================================================================================
                             #S(A,B) = G(O(x_1,y_1), ... O(x_n, y_n))    -> G = Dual(OB) (idx 19 to 13)
-                            #GB = 1 - np.power(np.Prod(1 - memberships[i], 1 - memberships[j]) * np.minimum(1 - memberships[i], 1 - memberships[j]), 1/2)
                 #================================================================================================================================
                 #O = Product
                 elif(self.sm == 19):
@@ -198,34 +195,88 @@ class FuzzyDissimilarityMerger:
                     min = np.minimum(memberships[i], memberships[j]) 
                     #Se o n=0 é o primeiro caso
                     if (self.similMatrix[i, j, 1] == 0):     
-                        self.auxMatrix[i, j, 0] = min
+                        self.auxMatrix[i, j, 0] = 1 - min
                         self.auxMatrix[i, j, 1] = 1 - Prod
+                        self.similMatrix[i, j, 0] = 1 - np.power(self.auxMatrix[i, j, 1] * self.auxMatrix[i, j, 0], 1/2)
+
                     #Senão n>=1    
                     else:
-                        self.auxMatrix[i, j, 0] = np.minimum(self.auxMatrix[i, j, 0], min)
+                        self.auxMatrix[i, j, 0] =  1 - np.minimum(self.auxMatrix[i, j, 0], 1 - min)
                         self.auxMatrix[i, j, 1] *= 1 - Prod
                         #GB =  1 - (PROD * MIN)^{1/2}
                         self.similMatrix[i, j, 0] = 1 - np.power(self.auxMatrix[i, j, 1] * self.auxMatrix[i, j, 0], 1/2)
                     self.similMatrix[i, j, 1] +=1
                     similarity = self.similMatrix[i, j, 0]
-                    #print(similarity)
    
                 #O = MIN
                 elif(self.sm == 20):                     
                     min = np.minimum(memberships[i], memberships[j])
-
+                    if (self.similMatrix[i, j, 1] == 0):
+                        self.auxMatrix[i, j, 0] = 1 - min
+                        self.similMatrix[i, j, 0] = 1 - np.power(self.auxMatrix[i, j, 0] * self.auxMatrix[i, j, 0], 1/2)
+                    else:    
+                        self.auxMatrix[i, j, 0] =  1 - np.minimum(self.auxMatrix[i, j, 0], 1 - min)
+                        self.similMatrix[i, j, 0] = 1 - np.power(self.auxMatrix[i, j, 0] * self.auxMatrix[i, j, 0], 1/2)
+                    self.similMatrix[i, j, 1] +=1
+                    similarity = self.similMatrix[i, j, 0]
+                    
                 #O = GM
                 elif(self.sm == 21):                     
                     GM = np.sqrt(memberships[i] * memberships[j])
+                    min = np.minimum(memberships[i], memberships[j]) 
+                    #Se o n=0 é o primeiro caso
+                    if (self.similMatrix[i, j, 1] == 0):     
+                        self.auxMatrix[i, j, 0] = 1 - min
+                        self.auxMatrix[i, j, 1] = 1 - GM
+                        self.similMatrix[i, j, 0] = 1 - np.power(self.auxMatrix[i, j, 1] * self.auxMatrix[i, j, 0], 1/2)
+
+                    #Senão n>=1    
+                    else:
+                        self.auxMatrix[i, j, 0] =  1 - np.minimum(self.auxMatrix[i, j, 0], 1 - min)
+                        self.auxMatrix[i, j, 1] *= 1 - GM
+                        #GB =  1 - (PROD * MIN)^{1/2}
+                        self.similMatrix[i, j, 0] = 1 - np.power(self.auxMatrix[i, j, 1] * self.auxMatrix[i, j, 0], 1/2)
+                    self.similMatrix[i, j, 1] +=1
+                    similarity = self.similMatrix[i, j, 0]
                     
                 #O = OB
                 elif(self.sm == 22):                     
                     OB = np.sqrt((memberships[i] * memberships[j]) * np.minimum( memberships[i], memberships[j]))
+                    min = np.minimum(memberships[i], memberships[j]) 
+                    #Se o n=0 é o primeiro caso
+                    if (self.similMatrix[i, j, 1] == 0):     
+                        self.auxMatrix[i, j, 0] = 1 - min
+                        self.auxMatrix[i, j, 1] = 1 - OB
+                        self.similMatrix[i, j, 0] = 1 - np.power(self.auxMatrix[i, j, 1] * self.auxMatrix[i, j, 0], 1/2)
+
+                    #Senão n>=1    
+                    else:
+                        self.auxMatrix[i, j, 0] =  1 - np.minimum(self.auxMatrix[i, j, 0], 1 - min)
+                        self.auxMatrix[i, j, 1] *= 1 - OB
+                        #GB =  1 - (PROD * MIN)^{1/2}
+                        self.similMatrix[i, j, 0] = 1 - np.power(self.auxMatrix[i, j, 1] * self.auxMatrix[i, j, 0], 1/2)
+                    self.similMatrix[i, j, 1] +=1
+                    similarity = self.similMatrix[i, j, 0]
                     
                 #O = ODiv
                 elif(self.sm == 23):                     
-                    ODiv = (memberships[i] * memberships[j] + np.minimum(memberships[i], memberships[j]))/2 
-                    
+                    ODiv = (memberships[i] * memberships[j] + np.minimum(memberships[i], memberships[j]))/2  
+                    min = np.minimum(memberships[i], memberships[j]) 
+                    #Se o n=0 é o primeiro caso
+                    if (self.similMatrix[i, j, 1] == 0):     
+                        self.auxMatrix[i, j, 0] = 1 - min
+                        self.auxMatrix[i, j, 1] = 1 - ODiv
+                        self.similMatrix[i, j, 0] = 1 - np.power(self.auxMatrix[i, j, 1] * self.auxMatrix[i, j, 0], 1/2)
+
+                    #Senão n>=1    
+                    else:
+                        self.auxMatrix[i, j, 0] =  1 - np.minimum(self.auxMatrix[i, j, 0], 1 - min)
+                        self.auxMatrix[i, j, 1] *= 1 - ODiv
+                        #GB =  1 - (PROD * MIN)^{1/2}
+                        self.similMatrix[i, j, 0] = 1 - np.power(self.auxMatrix[i, j, 1] * self.auxMatrix[i, j, 0], 1/2)
+                    self.similMatrix[i, j, 1] +=1
+                    similarity = self.similMatrix[i, j, 0]
+                   
                     
                 #================================================================================================================================
                             #S(A,B) = G(O(x_1,y_1), ... O(x_n, y_n))    -> G = Dual(ODiv) (idx 24 to 28)
@@ -236,13 +287,13 @@ class FuzzyDissimilarityMerger:
                     min = np.minimum(memberships[i], memberships[j])
                     #Se o n=0 é o primeiro caso
                     if (self.similMatrix[i, j, 1] == 0):     
-                        self.auxMatrix[i, j, 0] = min
+                        self.auxMatrix[i, j, 0] = 1 - Prod
                         self.auxMatrix[i, j, 1] = 1 - Prod
+                        self.similMatrix[i, j, 0] = 1 - ((self.auxMatrix[i, j, 1] + self.auxMatrix[i, j, 0])/2)
                     #Senão n>=1    
                     else:
-                        self.auxMatrix[i, j, 0] = np.minimum(self.auxMatrix[i, j, 0], min)
+                        self.auxMatrix[i, j, 0] = 1 - np.minimum(self.auxMatrix[i, j, 0], 1 - Prod)
                         self.auxMatrix[i, j, 1] *= 1 - Prod
-                        #GDiv =  1 - (PROD * MIN)^{1/2}
                         self.similMatrix[i, j, 0] = 1 - ((self.auxMatrix[i, j, 1] + self.auxMatrix[i, j, 0])/2)
                     self.similMatrix[i, j, 1] +=1
                     similarity = self.similMatrix[i, j, 0]
@@ -253,16 +304,16 @@ class FuzzyDissimilarityMerger:
                     min = np.minimum(memberships[i], memberships[j])
                     #Se o n=0 é o primeiro caso
                     if (self.similMatrix[i, j, 1] == 0):     
-                        self.auxMatrix[i, j, 0] = min
+                        self.auxMatrix[i, j, 0] = 1 - min
                         self.auxMatrix[i, j, 1] = 1 - min
+                        self.similMatrix[i, j, 0] = 1 - ((self.auxMatrix[i, j, 1] + self.auxMatrix[i, j, 0])/2)
                     #Senão n>=1    
                     else:
-                        self.auxMatrix[i, j, 0] = np.minimum(self.auxMatrix[i, j, 0], min)
+                        self.auxMatrix[i, j, 0] = 1 - np.minimum(self.auxMatrix[i, j, 0], 1 - min)
                         self.auxMatrix[i, j, 1] *= 1 - min
-                        #GDiv =  1 - (PROD * MIN)^{1/2}
                         self.similMatrix[i, j, 0] = 1 - ((self.auxMatrix[i, j, 1] + self.auxMatrix[i, j, 0])/2)
                     self.similMatrix[i, j, 1] +=1
-                    similarity = self.similMatrix[i, j, 0]  
+                    similarity = self.similMatrix[i, j, 0]                    
 
                 #O = GM
                 elif(self.sm == 26):                     
@@ -270,16 +321,16 @@ class FuzzyDissimilarityMerger:
                     min = np.minimum(memberships[i], memberships[j])
                     #Se o n=0 é o primeiro caso
                     if (self.similMatrix[i, j, 1] == 0):     
-                        self.auxMatrix[i, j, 0] = min
+                        self.auxMatrix[i, j, 0] = 1 - GM
                         self.auxMatrix[i, j, 1] = 1 - GM
+                        self.similMatrix[i, j, 0] = 1 - ((self.auxMatrix[i, j, 1] + self.auxMatrix[i, j, 0])/2)
                     #Senão n>=1    
                     else:
-                        self.auxMatrix[i, j, 0] = np.minimum(self.auxMatrix[i, j, 0], min)
+                        self.auxMatrix[i, j, 0] = 1 - np.minimum(self.auxMatrix[i, j, 0], 1 - min)
                         self.auxMatrix[i, j, 1] *= 1 - GM
-                        #GDiv =  1 - (PROD * MIN)^{1/2}
                         self.similMatrix[i, j, 0] = 1 - ((self.auxMatrix[i, j, 1] + self.auxMatrix[i, j, 0])/2)
                     self.similMatrix[i, j, 1] +=1
-                    similarity = self.similMatrix[i, j, 0]  
+                    similarity = self.similMatrix[i, j, 0]
  
 
                 #O = OB
@@ -288,31 +339,32 @@ class FuzzyDissimilarityMerger:
                     min = np.minimum(memberships[i], memberships[j])
                     #Se o n=0 é o primeiro caso
                     if (self.similMatrix[i, j, 1] == 0):     
-                        self.auxMatrix[i, j, 0] = min
+                        self.auxMatrix[i, j, 0] = 1 - OB
                         self.auxMatrix[i, j, 1] = 1 - OB
+                        self.similMatrix[i, j, 0] = 1 - ((self.auxMatrix[i, j, 1] + self.auxMatrix[i, j, 0])/2)
                     #Senão n>=1    
                     else:
-                        self.auxMatrix[i, j, 0] = np.minimum(self.auxMatrix[i, j, 0], min)
+                        self.auxMatrix[i, j, 0] = 1 - np.minimum(self.auxMatrix[i, j, 0], 1 - min)
                         self.auxMatrix[i, j, 1] *= 1 - OB
-                        #GDiv =  1 - (PROD * MIN)^{1/2}
                         self.similMatrix[i, j, 0] = 1 - ((self.auxMatrix[i, j, 1] + self.auxMatrix[i, j, 0])/2)
                     self.similMatrix[i, j, 1] +=1
-                    similarity = self.similMatrix[i, j, 0]  
+                    similarity = self.similMatrix[i, j, 0]
 
 
                 #O = ODiv
                 elif(self.sm == 28):                     
                     ODiv = (memberships[i] * memberships[j] + np.minimum(memberships[i], memberships[j]))/2 
+                    OB = np.sqrt((memberships[i] * memberships[j]) * np.minimum( memberships[i], memberships[j]))
                     min = np.minimum(memberships[i], memberships[j])
                     #Se o n=0 é o primeiro caso
                     if (self.similMatrix[i, j, 1] == 0):     
-                        self.auxMatrix[i, j, 0] = min
+                        self.auxMatrix[i, j, 0] = 1 - ODiv
                         self.auxMatrix[i, j, 1] = 1 - ODiv
+                        self.similMatrix[i, j, 0] = 1 - ((self.auxMatrix[i, j, 1] + self.auxMatrix[i, j, 0])/2)
                     #Senão n>=1    
                     else:
-                        self.auxMatrix[i, j, 0] = np.minimum(self.auxMatrix[i, j, 0], min)
+                        self.auxMatrix[i, j, 0] = 1 - np.minimum(self.auxMatrix[i, j, 0], 1 - min)
                         self.auxMatrix[i, j, 1] *= 1 - ODiv
-                        #GDiv =  1 - (PROD * MIN)^{1/2}
                         self.similMatrix[i, j, 0] = 1 - ((self.auxMatrix[i, j, 1] + self.auxMatrix[i, j, 0])/2)
                     self.similMatrix[i, j, 1] +=1
                     similarity = self.similMatrix[i, j, 0]  
@@ -355,9 +407,7 @@ class FuzzyDissimilarityMerger:
                     self.similMatrix[i, j, 1] += 1 
                     similarity = self.similMatrix[i, j, 0] / self.similMatrix[i, j, 1]  
 
-
                 if similarity >= threshold:
-                    #print("inside threshold")
                     fmics_to_merge.append([i, j, similarity])
 
         # Sort by most similar
