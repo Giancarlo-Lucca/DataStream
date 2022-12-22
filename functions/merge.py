@@ -13,6 +13,7 @@ class FuzzyDissimilarityMerger:
 
     def merge(self, fmics, threshold, memberships):
         fmics_to_merge = []
+
         for i in range(0, len(fmics) - 1):
             for j in range(i + 1, len(fmics)):
                 # Similarity S1 - euclidean
@@ -131,12 +132,12 @@ class FuzzyDissimilarityMerger:
                     min = np.minimum(memberships[i], memberships[j])                 
                     if (self.similMatrix[i, j, 1] == 0):
                         # n = 0
-                        self.auxMatrix[i, j, 1] = 1 - Min
+                        self.auxMatrix[i, j, 1] = 1 - min
                         self.similMatrix[i, j, 0] = 1 - self.auxMatrix[i, j, 1] 
                         
                     else:
                         #similarity
-                        self.auxMatrix[i, j, 1] *=  1 - Min
+                        self.auxMatrix[i, j, 1] *=  1 - min
                         self.similMatrix[i, j, 0] = 1 - np.power(self.auxMatrix[i, j, 1] , 1/self.similMatrix[i, j, 1]+1)
                     self.similMatrix[i, j, 1] += 1
                     similarity = self.similMatrix[i, j, 0]
@@ -187,7 +188,7 @@ class FuzzyDissimilarityMerger:
                     similarity = self.similMatrix[i, j, 0]
 
                 #================================================================================================================================
-                            #S(A,B) = G(O(x_1,y_1), ... O(x_n, y_n))    -> G = Dual(OB) (idx 19 to 13)
+                            #S(A,B) = G(O(x_1,y_1), ... O(x_n, y_n))    -> G = Dual(OB) (idx 19 to 23)
                 #================================================================================================================================
                 #O = Product
                 elif(self.sm == 19):
@@ -298,7 +299,6 @@ class FuzzyDissimilarityMerger:
                     self.similMatrix[i, j, 1] +=1
                     similarity = self.similMatrix[i, j, 0]
 
-
                 #O = MIN
                 elif(self.sm == 25):                     
                     min = np.minimum(memberships[i], memberships[j])
@@ -382,7 +382,7 @@ class FuzzyDissimilarityMerger:
                 #O = MIN
                 elif(self.sm == 30):                     
                     min = np.minimum(memberships[i], memberships[j])
-                    self.similMatrix[i, j, 0] += Min
+                    self.similMatrix[i, j, 0] += min
                     self.similMatrix[i, j, 1] += 1 
                     similarity = self.similMatrix[i, j, 0] / self.similMatrix[i, j, 1]    
 
