@@ -14,22 +14,21 @@ sm = 33
 min_fmics = 5
 max_fmics = 100
 thresh = 0.5
-threshList = [0.05, 0.1, 0.25, 0.5, 0.65, 0.8, 0.9]
-#threshList = [0.08]
+#threshList = [0.05, 0.1, 0.25, 0.5, 0.65, 0.8, 0.9]
+threshList = [0.08]
 chunksize=1000
 
 
 #new_row = {'Chunk':12, 'Purity':12, 'pCoefficient':12, 'pEntropy':12, 'XieBeni':12}
 #df2 = df.append(new_row, ignore_index=True)
 
-for simIDX in range (24, sm+1):
-
+for simIDX in range (1, sm+1):
     for threshIDX in threshList:
         df = pd.DataFrame(columns = ['Chunk', 'Purity', 'pCoefficient', 'pEntropy', 'XieBeni'])
         summarizer = DFuzzStreamSummarizer(
             distance_function=EuclideanDistance.distance,
             merge_threshold = threshIDX,
-            merge_function=FuzzyDissimilarityMerger(sm, max_fmics).merge,
+            merge_function=FuzzyDissimilarityMerger(1, max_fmics).merge,
             membership_function=FuzzyCMeansMembership.memberships,
             chunksize = chunksize
         )
@@ -49,16 +48,22 @@ for simIDX in range (24, sm+1):
                     summarizer.summarize(example[0:2], example[2], timestamp)
                     timestamp += 1
 
-               
+                
                 new_row = pd.DataFrame([["["+str(timestamp)+" to "+str(timestamp + 999)+"]", summarizer.Purity(), summarizer.PartitionCoefficient(), summarizer.PartitionEntropy(), summarizer.XieBeni()]], columns=df.columns)
                 df = pd.concat([df, new_row], ignore_index=True)
-
+                for fmic in summarizer.summary():
+                    print("Total de Fmics ="+str(len(summarizer.summary())))
+                    print("Total pontos classe 0 = " + str(fmic.sumPointsPerClass[0]))
+                    print("Total pontos classe 1 = "+ str(fmic.sumPointsPerClass[1]))
+                    print("Total pontos classe nan = "+ str(fmic.sumPointsPerClass[2]))
+                    print("---")
             # Transforming FMiCs into dataframe
             for fmic in summarizer.summary():
                 summary['x'].append(fmic.center[0])
                 summary['y'].append(fmic.center[1])
                 summary['weight'].append(fmic.m)
                 summary['class'].append(max(fmic.tags, key=fmic.tags.get))
+
             print("==== Approach ====")
             print("Similarity = ",simIDX)
             print("Threshold = ",threshIDX)
