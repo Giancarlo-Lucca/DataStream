@@ -10,12 +10,12 @@ from functions.membership import FuzzyCMeansMembership
 import pandas as pd
 
 
-sm = 33
+sm = 2
 min_fmics = 5
 max_fmics = 100
 thresh = 0.5
-#threshList = [0.05, 0.1, 0.25, 0.5, 0.65, 0.8, 0.9]
-threshList = [0.08]
+threshList = [0.05, 0.1, 0.25, 0.5, 0.65, 0.8, 0.9]
+#threshList = [0.08]
 chunksize=1000
 
 
@@ -28,7 +28,7 @@ for simIDX in range (1, sm+1):
         summarizer = DFuzzStreamSummarizer(
             distance_function=EuclideanDistance.distance,
             merge_threshold = threshIDX,
-            merge_function=FuzzyDissimilarityMerger(1, max_fmics).merge,
+            merge_function=FuzzyDissimilarityMerger(simIDX, max_fmics).merge,
             membership_function=FuzzyCMeansMembership.memberships,
             chunksize = chunksize
         )
@@ -36,13 +36,15 @@ for simIDX in range (1, sm+1):
         summary = {'x': [], 'y': [], 'weight': [], 'class': []}
         timestamp = 0
 
+        fhand = open('chunkFMICs.txt', 'a')
+
         # Read files in chunks
         with pd.read_csv("https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/Bench1_11k/Benchmark1_11000.csv",
                         dtype={"X1": float, "X2": float, "class": str},
                         chunksize = chunksize) as reader:       
             for chunk in reader:
                 print(f"Summarizing examples from {timestamp} to {timestamp + 999} -> sim {simIDX} and thrsh {threshIDX}")
-
+                fhand.write(f"Summarizing examples from {timestamp} to {timestamp + 999} -> sim {simIDX} and thrsh {threshIDX}\n")
                 for index, example in chunk.iterrows():
                     #Summarizing example
                     summarizer.summarize(example[0:2], example[2], timestamp)
@@ -51,12 +53,20 @@ for simIDX in range (1, sm+1):
                 
                 new_row = pd.DataFrame([["["+str(timestamp)+" to "+str(timestamp + 999)+"]", summarizer.Purity(), summarizer.PartitionCoefficient(), summarizer.PartitionEntropy(), summarizer.XieBeni()]], columns=df.columns)
                 df = pd.concat([df, new_row], ignore_index=True)
+                
+                fhand.write("Total de Fmics = "+str(len(summarizer.summary())))
+                #print("Total de Fmics = "+str(len(summarizer.summary())))
                 for fmic in summarizer.summary():
-                    print("Total de Fmics ="+str(len(summarizer.summary())))
-                    print("Total pontos classe 0 = " + str(fmic.sumPointsPerClass[0]))
-                    print("Total pontos classe 1 = "+ str(fmic.sumPointsPerClass[1]))
-                    print("Total pontos classe nan = "+ str(fmic.sumPointsPerClass[2]))
-                    print("---")
+                    '''
+                    print("\tTotal pontos classe 0 = " + str(fmic.sumPointsPerClass[0]))
+                    print("\tTotal pontos classe 1 = "+ str(fmic.sumPointsPerClass[1]))
+                    print("\tTotal pontos classe nan = "+ str(fmic.sumPointsPerClass[2]))
+                    print("------------------")
+                    '''
+                    fhand.write("\nTotal pontos classe 0 = " + str(fmic.sumPointsPerClass[0]) + "\n")
+                    fhand.write("\nTotal pontos classe 1 = "+ str(fmic.sumPointsPerClass[1]) + "\n")
+                    fhand.write("\nTotal pontos classe nan = "+ str(fmic.sumPointsPerClass[2]) + "\n")
+                    fhand.write("------------------")
             # Transforming FMiCs into dataframe
             for fmic in summarizer.summary():
                 summary['x'].append(fmic.center[0])
@@ -96,3 +106,4 @@ for simIDX in range (1, sm+1):
         f.write("\n------------------------------------------------------------")
 print("--- End of execution --- ")
 f.close()
+fhand.close()
