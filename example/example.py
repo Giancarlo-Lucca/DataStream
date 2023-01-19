@@ -14,8 +14,8 @@ sm = 2
 min_fmics = 5
 max_fmics = 100
 thresh = 0.5
-threshList = [0.05, 0.1, 0.25, 0.5, 0.65, 0.8, 0.9]
-#threshList = [0.08]
+#threshList = [0.05, 0.1, 0.25, 0.5, 0.65, 0.8, 0.9]
+threshList = [0.8, 0.9]
 chunksize=1000
 color = {'1': 'Red', '2': 'Blue', 'nan': 'Gray'}
 figure = plt.figure()
@@ -69,6 +69,34 @@ for simIDX in range (1, sm+1):
                     fhand.write("\nTotal pontos classe 1 = "+ str(fmic.sumPointsPerClass[1]) + "\n")
                     fhand.write("\nTotal pontos classe nan = "+ str(fmic.sumPointsPerClass[2]) + "\n")
                     fhand.write("------------------")
+
+                    summary['x'].append(fmic.center[0])
+                    summary['y'].append(fmic.center[1])
+                    summary['radius'].append(fmic.radius * 100000)
+                    summary['color'].append(color[max(fmic.tags, key=fmic.tags.get)])
+                    summary['weight'].append(fmic.m)
+
+                if not os.path.isdir("./Img/"):
+                    os.mkdir("./Img/") 
+                    
+                fig = plt.figure()
+                # Plot radius
+                plt.scatter('x', 'y', s='radius', color='color', data=summary, alpha=0.1)
+                # Plot centroids
+                plt.scatter('x', 'y', s=1, color='color', data=summary)
+                #plt.legend(["color blue", "color green"], loc ="lower right")
+                #plt.legend(["Purity"+str(summarizer.Purity()),"PartitionCoefficient"+str(summarizer.PartitionCoefficient()),"XieBeni"+str(summarizer.XieBeni()),"PartitionEntropy"+str(summarizer.PartitionEntropy())], bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+                #plt.figtext(.8, .8, "T = 4K")
+                side_text = plt.figtext(.91, .8, "Purity"+str(round(summarizer.Purity(), 3))+"\nPartitionCoefficient"+str(round(summarizer.PartitionCoefficient(), 3))+"\nPartitionEntropy"+str(round(summarizer.PartitionEntropy(), 3))+"\nXieBeni"+str(round(summarizer.XieBeni(),3)))
+                fig.subplots_adjust(top=1.0)
+                #plt.show()
+                print("CHUNKS - "+str(timestamp))
+                fig.savefig("./Img/[Chunk "+str(timestamp - 1000)+" to "+str(timestamp - 1)+"] Sim("+str(simIDX)+")_Thresh("+str(threshIDX)+").png", bbox_extra_artists=(side_text,), bbox_inches='tight')
+                plt.close()
+
+
+
+
             
             # Transforming FMiCs into dataframe
             for fmic in summarizer.summary():
@@ -78,18 +106,7 @@ for simIDX in range (1, sm+1):
                 summary['color'].append(color[max(fmic.tags, key=fmic.tags.get)])
                 summary['weight'].append(fmic.m)
                 summary['class'].append(max(fmic.tags, key=fmic.tags.get))
-
-            # Plot radius
-            plt.scatter('x', 'y', s='radius', color='color', data=summary, alpha=0.1)
-            # Plot centroids
-            plt.scatter('x', 'y', s=1, color='color', data=summary)
-            #plt.legend(["color blue", "color green"], loc ="lower right")
-            # bbox_to_anchor=(0.9, 1.0),
-            plt.legend(["Purity"+str(summarizer.Purity()),"PartitionCoefficient"+str(summarizer.PartitionCoefficient()),"PartitionEntropy"+str(summarizer.PartitionEntropy()),"XieBeni"+str(summarizer.XieBeni())], loc ='lower left')
-            #plt.figtext(.8, .8, "T = 4K")
-        
-            plt.show()
-
+            
             print("==== Approach ====")
             print("Similarity = ",simIDX)
             print("Threshold = ",threshIDX)
