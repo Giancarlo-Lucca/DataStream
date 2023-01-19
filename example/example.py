@@ -8,7 +8,7 @@ from functions.merge import FuzzyDissimilarityMerger
 from functions.distance import EuclideanDistance
 from functions.membership import FuzzyCMeansMembership
 import pandas as pd
-
+import matplotlib.pyplot as plt
 
 sm = 2
 min_fmics = 5
@@ -17,7 +17,9 @@ thresh = 0.5
 threshList = [0.05, 0.1, 0.25, 0.5, 0.65, 0.8, 0.9]
 #threshList = [0.08]
 chunksize=1000
-
+color = {'1': 'Red', '2': 'Blue', 'nan': 'Gray'}
+figure = plt.figure()
+scatter = plt.scatter('x', 'y', s='radius', data={'x': [], 'y': [], 'radius': []})
 
 #new_row = {'Chunk':12, 'Purity':12, 'pCoefficient':12, 'pEntropy':12, 'XieBeni':12}
 #df2 = df.append(new_row, ignore_index=True)
@@ -33,7 +35,7 @@ for simIDX in range (1, sm+1):
             chunksize = chunksize
         )
 
-        summary = {'x': [], 'y': [], 'weight': [], 'class': []}
+        summary = {'x': [], 'y': [], 'radius' : [], 'color': [], 'weight': [], 'class': []}
         timestamp = 0
 
         fhand = open('chunkFMICs.txt', 'a')
@@ -67,12 +69,26 @@ for simIDX in range (1, sm+1):
                     fhand.write("\nTotal pontos classe 1 = "+ str(fmic.sumPointsPerClass[1]) + "\n")
                     fhand.write("\nTotal pontos classe nan = "+ str(fmic.sumPointsPerClass[2]) + "\n")
                     fhand.write("------------------")
+            
             # Transforming FMiCs into dataframe
             for fmic in summarizer.summary():
                 summary['x'].append(fmic.center[0])
                 summary['y'].append(fmic.center[1])
+                summary['radius'].append(fmic.radius * 100000)
+                summary['color'].append(color[max(fmic.tags, key=fmic.tags.get)])
                 summary['weight'].append(fmic.m)
                 summary['class'].append(max(fmic.tags, key=fmic.tags.get))
+
+            # Plot radius
+            plt.scatter('x', 'y', s='radius', color='color', data=summary, alpha=0.1)
+            # Plot centroids
+            plt.scatter('x', 'y', s=1, color='color', data=summary)
+            #plt.legend(["color blue", "color green"], loc ="lower right")
+            # bbox_to_anchor=(0.9, 1.0),
+            plt.legend(["Purity"+str(summarizer.Purity()),"PartitionCoefficient"+str(summarizer.PartitionCoefficient()),"PartitionEntropy"+str(summarizer.PartitionEntropy()),"XieBeni"+str(summarizer.XieBeni())], loc ='lower left')
+            #plt.figtext(.8, .8, "T = 4K")
+        
+            plt.show()
 
             print("==== Approach ====")
             print("Similarity = ",simIDX)
