@@ -10,12 +10,12 @@ from functions.membership import FuzzyCMeansMembership
 import pandas as pd
 import matplotlib.pyplot as plt
 
-sm = 2
+sm = 33
 min_fmics = 5
 max_fmics = 100
 thresh = 0.5
 #threshList = [0.05, 0.1, 0.25, 0.5, 0.65, 0.8, 0.9]
-threshList = [0.8, 0.9]
+threshList = [0.9]
 chunksize=1000
 color = {'1': 'Red', '2': 'Blue', 'nan': 'Gray'}
 figure = plt.figure()
@@ -90,7 +90,6 @@ for simIDX in range (1, sm+1):
                 side_text = plt.figtext(.91, .8, "Purity"+str(round(summarizer.Purity(), 3))+"\nPartitionCoefficient"+str(round(summarizer.PartitionCoefficient(), 3))+"\nPartitionEntropy"+str(round(summarizer.PartitionEntropy(), 3))+"\nXieBeni"+str(round(summarizer.XieBeni(),3)))
                 fig.subplots_adjust(top=1.0)
                 #plt.show()
-                print("CHUNKS - "+str(timestamp))
                 fig.savefig("./Img/[Chunk "+str(timestamp - 1000)+" to "+str(timestamp - 1)+"] Sim("+str(simIDX)+")_Thresh("+str(threshIDX)+").png", bbox_extra_artists=(side_text,), bbox_inches='tight')
                 plt.close()
 
