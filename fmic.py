@@ -11,6 +11,8 @@ class FMiC:
         self.timestamp = timestamp
         self.center = cf.copy()
         self.radius = 0.0
+        self.individualMemberships = np.array([])
+        self.values = 0
 
         self.mSquare = 0.0
         self.mLog = 0.0
@@ -26,6 +28,7 @@ class FMiC:
         self.m += membership
         self.n += 1
         self.ssd += membership * pow(distance, 2)
+        self.individualMemberships = np.append(self.individualMemberships,membership)
 
 
         self.mSquare += membership **2
@@ -41,6 +44,7 @@ class FMiC:
 
         for idx, value in enumerate(values):
             self.cf[idx] += value * membership
+            self.values *= value
 
         self.tags[str(tag)] = self.tags.setdefault(str(tag), 0) + membership
 
@@ -56,6 +60,8 @@ class FMiC:
         merged_fmic.n = fmic_a.n + fmic_b.n
         merged_fmic.center = fmic_a.center.copy()
         merged_fmic.sumPointsPerClass = fmic_a.sumPointsPerClass + fmic_b.sumPointsPerClass
+        merged_fmic.individualMemberships = np.concatenate((fmic_a.individualMemberships,fmic_b.individualMemberships))
+        merged_fmic.values = fmic_a.values + fmic_b.values
 
         merged_fmic.tags = fmic_a.tags
 

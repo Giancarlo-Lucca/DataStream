@@ -92,6 +92,13 @@ class DFuzzStreamSummarizer:
             
         return (1/self.chunksize * mSquare)
 
+    def ModifiedPartitionCoefficient(self):
+        mSquare = 0
+        for idxFMIC, fmic in enumerate(self.__fmics):
+            mSquare += fmic.mSquare
+            
+        return 1 - (len(self.__fmics)/len(self.__fmics)-1)*(1 - (1/self.chunksize * mSquare))
+
     def PartitionEntropy(self):
         mLog = 0
         for idxFMIC, fmic in enumerate(self.__fmics):
@@ -111,6 +118,31 @@ class DFuzzStreamSummarizer:
         MinDist = np.min(np.linalg.norm(centroidList, axis=1))
                 
         return (1/self.chunksize * sumaSSD)/MinDist
+
+    def FukuyamaSugeno_1(self):
+        sumaSSD = 0
+        centroidList = np.ones((len(self.__fmics), 2))*1000000
+        membershipList = np.ones(len(self.__fmics))
+
+        for idxFMIC, fmic in enumerate(self.__fmics):
+            sumaSSD += fmic.ssd 
+            centroidList[idxFMIC, :] = fmic.center
+            membershipList[idxFMIC] = fmic.m
+
+        mediaCentroid = np.mean(centroidList/len(self.__fmics), axis=0)
+    
+        return sumaSSD - np.sum(membershipList * np.linalg.norm(centroidList-mediaCentroid, axis=1))
+
+    def FukuyamaSugeno_2(self):
+        sumaSSD = 0
+        centroidList = np.ones((len(self.__fmics), 2))*1000000
+
+        for idxFMIC, fmic in enumerate(self.__fmics):
+            sumaSSD += fmic.ssd 
+            centroidList[idxFMIC, :] = fmic.center
+
+
+        somadosValues = 1/fmic.n * fmic.somaValore
 
     def summary(self):
         return self.__fmics.copy()
