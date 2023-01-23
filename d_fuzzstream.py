@@ -119,5 +119,30 @@ class DFuzzStreamSummarizer:
                 
         return (1/self.chunksize * sumaSSD)/MinDist
 
+    def FukuyamaSugeno_1(self):
+        sumaSSD = 0
+        centroidList = np.ones((len(self.__fmics), 2))*1000000
+        membershipList = np.ones(len(self.__fmics))
+
+        for idxFMIC, fmic in enumerate(self.__fmics):
+            sumaSSD += fmic.ssd 
+            centroidList[idxFMIC, :] = fmic.center
+            membershipList[idxFMIC] = fmic.m
+
+        mediaCentroid = np.mean(centroidList/len(self.__fmics), axis=0)
+    
+        return sumaSSD - np.sum(membershipList * np.linalg.norm(centroidList-mediaCentroid, axis=1))
+
+    def FukuyamaSugeno_2(self):
+        sumaSSD = 0
+        centroidList = np.ones((len(self.__fmics), 2))*1000000
+
+        for idxFMIC, fmic in enumerate(self.__fmics):
+            sumaSSD += fmic.ssd 
+            centroidList[idxFMIC, :] = fmic.center
+
+
+        somadosValues = 1/fmic.n * fmic.somaValore
+
     def summary(self):
         return self.__fmics.copy()
