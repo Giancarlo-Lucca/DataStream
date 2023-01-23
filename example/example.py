@@ -76,6 +76,8 @@ for simIDX in range (1, sm+1):
                     summary['color'].append(color[max(fmic.tags, key=fmic.tags.get)])
                     summary['weight'].append(fmic.m)
 
+                print(summarizer.FukuyamaSugeno_1())
+
                 if not os.path.isdir("./Img/"):
                     os.mkdir("./Img/") 
                     
@@ -87,7 +89,7 @@ for simIDX in range (1, sm+1):
                 #plt.legend(["color blue", "color green"], loc ="lower right")
                 #plt.legend(["Purity"+str(summarizer.Purity()),"PartitionCoefficient"+str(summarizer.PartitionCoefficient()),"XieBeni"+str(summarizer.XieBeni()),"PartitionEntropy"+str(summarizer.PartitionEntropy())], bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
                 #plt.figtext(.8, .8, "T = 4K")
-                side_text = plt.figtext(.91, .8, "Purity"+str(round(summarizer.Purity(), 3))+"\nPartitionCoefficient"+str(round(summarizer.PartitionCoefficient(), 3))+"\nPartitionEntropy"+str(round(summarizer.PartitionEntropy(), 3))+"\nXieBeni"+str(round(summarizer.XieBeni(),3)))
+                side_text = plt.figtext(.91, .8, "Purity"+str(round(summarizer.Purity(), 3))+"\nPartitionCoefficient"+str(round(summarizer.PartitionCoefficient(), 3))+"\nPartitionEntropy"+str(round(summarizer.PartitionEntropy(), 3))+"\nXieBeni"+str(round(summarizer.XieBeni(),3))+"\FukuyamaSugeno_1"+str(round(summarizer.FukuyamaSugeno_1(),3)))
                 fig.subplots_adjust(top=1.0)
                 #plt.show()
                 print("CHUNKS - "+str(timestamp))
