@@ -92,6 +92,13 @@ class DFuzzStreamSummarizer:
             
         return (1/self.chunksize * mSquare)
 
+    def ModifiedPartitionCoefficient(self):
+        mSquare = 0
+        for idxFMIC, fmic in enumerate(self.__fmics):
+            mSquare += fmic.mSquare
+            
+        return 1 - (len(self.__fmics)/len(self.__fmics)-1)*(1 - (1/self.chunksize * mSquare))
+
     def PartitionEntropy(self):
         mLog = 0
         for idxFMIC, fmic in enumerate(self.__fmics):
