@@ -37,11 +37,11 @@ class FuzzyDissimilarityMerger:
                             #S(A,B) = AM(REF(x_1,y_1), ... REF(x_n, y_n))
                 #================================================================================================================================                
                 elif(self.sm  == 3):
-                    t = 10
+                    t = 2
                     self.similMatrix[i, j, 0] += np.power(1 - np.absolute(memberships[i] - memberships[j]), 1/t)
                     self.similMatrix[i, j, 1] += 1 #NAO È A MÉDIA É O NUMERO DE PONTOS!!!
                     similarity = self.similMatrix[i, j, 0] / self.similMatrix[i, j, 1]
-
+                    
                 #================================================================================================================================
                             #S(A,B) = G(O(x_1,y_1), ... O(x_n, y_n))    -> G = Probabilistic Sum (idx 4 to 8)
                 #================================================================================================================================

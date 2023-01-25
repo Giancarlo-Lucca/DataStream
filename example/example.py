@@ -15,7 +15,7 @@ min_fmics = 5
 max_fmics = 100
 thresh = 0.5
 #threshList = [0.05, 0.1, 0.25, 0.5, 0.65, 0.8, 0.9]
-threshList = [0.9]
+threshList = [0.85]
 chunksize=1000
 color = {'1': 'Red', '2': 'Blue', 'nan': 'Gray'}
 figure = plt.figure()
@@ -26,7 +26,7 @@ scatter = plt.scatter('x', 'y', s='radius', data={'x': [], 'y': [], 'radius': []
 
 for simIDX in range (1, sm+1):
     for threshIDX in threshList:
-        df = pd.DataFrame(columns = ['Chunk', 'Purity', 'pCoefficient', 'pEntropy', 'XieBeni'])
+        df = pd.DataFrame(columns = ['Chunk', 'Purity', 'pCoefficient', 'pEntropy', 'XieBeni','FukuyamaSugeno_1','FukuyamaSugeno_2'])
         summarizer = DFuzzStreamSummarizer(
             distance_function=EuclideanDistance.distance,
             merge_threshold = threshIDX,
@@ -53,7 +53,7 @@ for simIDX in range (1, sm+1):
                     timestamp += 1
 
                 
-                new_row = pd.DataFrame([["["+str(timestamp)+" to "+str(timestamp + 999)+"]", summarizer.Purity(), summarizer.PartitionCoefficient(), summarizer.PartitionEntropy(), summarizer.XieBeni()]], columns=df.columns)
+                new_row = pd.DataFrame([["["+str(timestamp)+" to "+str(timestamp + 999)+"]", summarizer.Purity(), summarizer.PartitionCoefficient(), summarizer.PartitionEntropy(), summarizer.XieBeni(), summarizer.FukuyamaSugeno_1(), summarizer.FukuyamaSugeno_2()]], columns=df.columns)
                 df = pd.concat([df, new_row], ignore_index=True)
                 
                 fhand.write("Total de Fmics = "+str(len(summarizer.summary())))
@@ -76,8 +76,6 @@ for simIDX in range (1, sm+1):
                     summary['color'].append(color[max(fmic.tags, key=fmic.tags.get)])
                     summary['weight'].append(fmic.m)
 
-                print(summarizer.FukuyamaSugeno_1())
-
                 if not os.path.isdir("./Img/"):
                     os.mkdir("./Img/") 
                     
@@ -87,18 +85,14 @@ for simIDX in range (1, sm+1):
                 # Plot centroids
                 plt.scatter('x', 'y', s=1, color='color', data=summary)
                 #plt.legend(["color blue", "color green"], loc ="lower right")
-                #plt.legend(["Purity"+str(summarizer.Purity()),"PartitionCoefficient"+str(summarizer.PartitionCoefficient()),"XieBeni"+str(summarizer.XieBeni()),"PartitionEntropy"+str(summarizer.PartitionEntropy())], bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-                #plt.figtext(.8, .8, "T = 4K")
-                side_text = plt.figtext(.91, .8, "Purity"+str(round(summarizer.Purity(), 3))+"\nPartitionCoefficient"+str(round(summarizer.PartitionCoefficient(), 3))+"\nPartitionEntropy"+str(round(summarizer.PartitionEntropy(), 3))+"\nXieBeni"+str(round(summarizer.XieBeni(),3))+"\FukuyamaSugeno_1"+str(round(summarizer.FukuyamaSugeno_1(),3)))
+                #plt.legend(["Purity"+str(summarizer.Purity()),"PartitionCoefficient"+str(summarizer.PartitionCoefficient()),"PartitionEntropy"+str(summarizer.PartitionEntropy()),"XieBeni"+str(summarizer.XieBeni()), "FukuyamaSugeno_1"+str(summarizer.FukuyamaSugeno_1()),"FukuyamaSugeno_2"+str(summarizer.FukuyamaSugeno_2())], bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+                plt.figtext(.8, .8, "T = 4K")
+                side_text = plt.figtext(.91, .8, "Purity: "+str(round(summarizer.Purity(), 3))+"\nPartitionCoefficient: "+str(round(summarizer.PartitionCoefficient(), 3))+"\nPartitionEntropy: "+str(round(summarizer.PartitionEntropy(), 3))+"\nXieBeni: "+str(round(summarizer.XieBeni(),3))+"\nFukuyamaSugeno_1: "+str(round(summarizer.FukuyamaSugeno_1(),3))+"\nFukuyamaSugeno_2: "+str(round(summarizer.FukuyamaSugeno_2(),3)))
                 fig.subplots_adjust(top=1.0)
                 #plt.show()
                 fig.savefig("./Img/[Chunk "+str(timestamp - 1000)+" to "+str(timestamp - 1)+"] Sim("+str(simIDX)+")_Thresh("+str(threshIDX)+").png", bbox_extra_artists=(side_text,), bbox_inches='tight')
                 plt.close()
 
-
-
-
-            
             # Transforming FMiCs into dataframe
             for fmic in summarizer.summary():
                 summary['x'].append(fmic.center[0])
