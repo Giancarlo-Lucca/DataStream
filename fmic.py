@@ -44,7 +44,7 @@ class FMiC:
 
         for idx, value in enumerate(values):
             self.cf[idx] += value * membership
-            self.values *= value
+            self.values += value
 
         self.tags[str(tag)] = self.tags.setdefault(str(tag), 0) + membership
 
@@ -59,7 +59,10 @@ class FMiC:
         merged_fmic.ssd = fmic_a.ssd + fmic_b.ssd
         merged_fmic.n = fmic_a.n + fmic_b.n
         merged_fmic.center = fmic_a.center.copy()
-        merged_fmic.sumPointsPerClass = fmic_a.sumPointsPerClass + fmic_b.sumPointsPerClass
+        #merged_fmic.sumPointsPerClass = fmic_a.sumPointsPerClass + fmic_b.sumPointsPerClass
+        merged_fmic.sumPointsPerClass[0] = fmic_a.sumPointsPerClass[0] + fmic_b.sumPointsPerClass[0]
+        merged_fmic.sumPointsPerClass[1] = fmic_a.sumPointsPerClass[1] + fmic_b.sumPointsPerClass[1]
+        merged_fmic.sumPointsPerClass[2] = fmic_a.sumPointsPerClass[2] + fmic_b.sumPointsPerClass[2]
         merged_fmic.individualMemberships = np.concatenate((fmic_a.individualMemberships,fmic_b.individualMemberships))
         merged_fmic.values = fmic_a.values + fmic_b.values
 
