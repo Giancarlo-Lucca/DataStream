@@ -9,6 +9,7 @@ from functions.distance import EuclideanDistance
 from functions.membership import FuzzyCMeansMembership
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 #sm = 33
 sm = [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33]
@@ -26,8 +27,12 @@ scatter = plt.scatter('x', 'y', s='radius', data={'x': [], 'y': [], 'radius': []
 #new_row = {'Chunk':12, 'Purity':12, 'pCoefficient':12, 'pEntropy':12, 'XieBeni':12}
 #df2 = df.append(new_row, ignore_index=True)
 
+
+
 for simIDX in sm:
-    for threshIDX in threshList:
+    tabRes = pd.DataFrame(np.zeros((15,5)))
+    tabRes.columns = [0.25,0.5,0.65,0.8,0.9]
+    for thNum, threshIDX in enumerate(threshList):
         df = pd.DataFrame(columns = ['Chunk', 'Purity', 'pCoefficient', 'pEntropy', 'XieBeni','MPC','FukuyamaSugeno_1','FukuyamaSugeno_2'])
         summarizer = DFuzzStreamSummarizer(
             distance_function=EuclideanDistance.distance,
@@ -116,6 +121,12 @@ for simIDX in sm:
             print("\n")
             print(df)
             print("------")
+
+            tabRes.iloc[0:11,thNum] = df['XieBeni']
+            tabRes.iloc[11,thNum] = summarizer.metrics['creations']
+            tabRes.iloc[12,thNum] = summarizer.metrics['absorptions']
+            tabRes.iloc[13,thNum] = summarizer.metrics['removals']
+            tabRes.iloc[14,thNum] = summarizer.metrics['merges']
         
             output = "\n==== Approach ===="
             output = output + str("\n Similarity ="+str(simIDX))
@@ -133,7 +144,7 @@ for simIDX in sm:
             with open('directOUTPUT.txt', 'a') as f:
                 f.write(output)
 
-
+    tabRes.to_excel("./output/XieBeni_sm"+str(simIDX)+".xlsx")
     with open('directOUTPUT.txt', 'a') as f:
         f.write("\n------------------------------------------------------------")
 print("--- End of execution --- ")
