@@ -24,6 +24,13 @@ color = {'1': 'Red', '2': 'Blue', '3': 'Green', 'nan': 'Gray'}
 figure = plt.figure()
 scatter = plt.scatter('x', 'y', s='radius', data={'x': [], 'y': [], 'radius': []})
 
+datasetName = 'RBF1_40000' # Benchmark1_11000, RBF1_40000
+
+if (datasetName == 'Benchmark1_11000'):
+    datasetPath = "https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/Bench1_11k/Benchmark1_11000.csv"
+elif (datasetName == 'RBF1_40000'):
+    datasetPath = "https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/RBF1_40k/RBF1_40000.csv"
+
 #new_row = {'Chunk':12, 'Purity':12, 'pCoefficient':12, 'pEntropy':12, 'XieBeni':12}
 #df2 = df.append(new_row, ignore_index=True)
 
@@ -48,7 +55,8 @@ for simIDX in sm:
         fhand = open('chunkFMICs.txt', 'a')
 
         # Read files in chunks
-        with pd.read_csv("https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/Bench1_11k/Benchmark1_11000.csv",
+        with pd.read_csv(datasetPath,
+        #with pd.read_csv("https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/Bench1_11k/Benchmark1_11000.csv",
         #with pd.read_csv("https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/RBF1_40k/RBF1_40000.csv",
                         dtype={"X1": float, "X2": float, "class": str},
                         chunksize = chunksize) as reader:       
