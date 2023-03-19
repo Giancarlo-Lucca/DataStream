@@ -1,4 +1,5 @@
 import os, sys
+from pathlib import Path
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
@@ -28,8 +29,13 @@ datasetName = 'RBF1_40000' # Benchmark1_11000, RBF1_40000
 
 if (datasetName == 'Benchmark1_11000'):
     datasetPath = "https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/Bench1_11k/Benchmark1_11000.csv"
+    numChunks = 11
 elif (datasetName == 'RBF1_40000'):
     datasetPath = "https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/RBF1_40k/RBF1_40000.csv"
+    numChunks = 40
+output_path = "".join(("./output/",datasetName,"/"))
+
+Path(output_path).mkdir(exist_ok=True)
 
 #new_row = {'Chunk':12, 'Purity':12, 'pCoefficient':12, 'pEntropy':12, 'XieBeni':12}
 #df2 = df.append(new_row, ignore_index=True)
@@ -37,7 +43,7 @@ elif (datasetName == 'RBF1_40000'):
 
 
 for simIDX in sm:
-    tabRes = pd.DataFrame(np.zeros((15,5)))
+    tabRes = pd.DataFrame(np.zeros((numChunks+4,5)))
     tabRes.columns = [0.25,0.5,0.65,0.8,0.9]
     for thNum, threshIDX in enumerate(threshList):
         df = pd.DataFrame(columns = ['Chunk', 'Purity', 'pCoefficient', 'pEntropy', 'XieBeni','MPC','FukuyamaSugeno_1','FukuyamaSugeno_2'])
@@ -130,11 +136,11 @@ for simIDX in sm:
             print(df)
             print("------")
 
-            tabRes.iloc[0:11,thNum] = df['XieBeni']
-            tabRes.iloc[11,thNum] = summarizer.metrics['creations']
-            tabRes.iloc[12,thNum] = summarizer.metrics['absorptions']
-            tabRes.iloc[13,thNum] = summarizer.metrics['removals']
-            tabRes.iloc[14,thNum] = summarizer.metrics['merges']
+            tabRes.iloc[0:numChunks,thNum] = df['XieBeni']
+            tabRes.iloc[numChunks,thNum] = summarizer.metrics['creations']
+            tabRes.iloc[numChunks+1,thNum] = summarizer.metrics['absorptions']
+            tabRes.iloc[numChunks+2,thNum] = summarizer.metrics['removals']
+            tabRes.iloc[numChunks+3,thNum] = summarizer.metrics['merges']
         
             output = "\n==== Approach ===="
             output = output + str("\n Similarity ="+str(simIDX))
@@ -152,7 +158,8 @@ for simIDX in sm:
             with open('directOUTPUT.txt', 'a') as f:
                 f.write(output)
 
-    tabRes.to_excel("./output/XieBeni_sm"+str(simIDX)+".xlsx")
+    tabRes.to_excel("".join((output_path,"XieBeni_sm",str(simIDX),".xlsx")))
+    #tabRes.to_excel("./output/XieBeni_sm"+str(simIDX)+".xlsx")
     with open('directOUTPUT.txt', 'a') as f:
         f.write("\n------------------------------------------------------------")
 print("--- End of execution --- ")
