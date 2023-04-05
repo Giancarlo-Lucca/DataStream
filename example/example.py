@@ -12,7 +12,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-#sm = 33
+#sm = 20
 sm = [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33]
 min_fmics = 5
 max_fmics = 100
@@ -39,8 +39,6 @@ Path(output_path).mkdir(exist_ok=True)
 
 #new_row = {'Chunk':12, 'Purity':12, 'pCoefficient':12, 'pEntropy':12, 'XieBeni':12}
 #df2 = df.append(new_row, ignore_index=True)
-
-
 
 for simIDX in sm:
     tabRes = pd.DataFrame(np.zeros((numChunks+4,5)))
