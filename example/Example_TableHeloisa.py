@@ -24,7 +24,7 @@ color = {'1': 'Red', '2': 'Blue', '3': 'Green', 'nan': 'Gray'}
 figure = plt.figure()
 scatter = plt.scatter('x', 'y', s='radius', data={'x': [], 'y': [], 'radius': []})
 
-datasetName = 'Benchmark1_11000' # Benchmark1_11000, RBF1_40000
+datasetName = 'RBF1_40000' # Benchmark1_11000, RBF1_40000
 
 numChunks = 5
 
@@ -160,7 +160,7 @@ for vecIndex, simIDX in enumerate(sm):
         with open('directOUTPUT.txt', 'a') as f:
             f.write(output)
 
-tabRes.to_excel("".join((output_path,"Example_TableHeloisa.xlsx")))
+tabRes.to_excel("".join((output_path,"Example_TableHeloisa_MPC.xlsx")))
 #tabRes.to_excel("./output/XieBeni_sm"+str(simIDX)+".xlsx")
 with open('directOUTPUT.txt', 'a') as f:
     f.write("\n------------------------------------------------------------")
