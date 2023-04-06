@@ -139,8 +139,10 @@ for vecIndex, simIDX in enumerate(sm):
         print(df)
         print("------")
 
-        tabRes.iloc[vecIndex, 1:5] = df['XieBeni'].T
-        tabRes.iloc[vecIndex, 6::] = df['MPC'].T
+        tabRes.iloc[vecIndex, [0, 2, 4, 6, 8]] = df['XieBeni']
+        tabRes.iloc[vecIndex, [1, 3, 5, 7, 9]] = df['MPC']
+        tabRes.iloc[vecIndex, 10] = df['XieBeni'].mean()
+        tabRes.iloc[vecIndex, 11] = df['MPC'].mean()
     
         output = "\n==== Approach ===="
         output = output + str("\n Similarity ="+str(simIDX))
