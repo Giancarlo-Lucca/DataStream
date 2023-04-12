@@ -26,6 +26,11 @@ scatter = plt.scatter('x', 'y', s='radius', data={'x': [], 'y': [], 'radius': []
 
 datasetName = 'RBF1_40000' # Benchmark1_11000, RBF1_40000
 
+
+
+
+
+
 numChunks = 5
 
 if (datasetName == 'Benchmark1_11000'):
