@@ -24,23 +24,19 @@ color = {'1': 'Red', '2': 'Blue', '3': 'Green', 'nan': 'Gray'}
 figure = plt.figure()
 scatter = plt.scatter('x', 'y', s='radius', data={'x': [], 'y': [], 'radius': []})
 
-datasetName = 'RBF1_40000' # Benchmark1_11000, RBF1_40000
-
-
-
-
-
-
-numChunks = 5
+#datasetName = 'RBF1_40000' # Benchmark1_11000, RBF1_40000
+datasetName = 'Benchmark1_11000'
 
 if (datasetName == 'Benchmark1_11000'):
     datasetPath = "https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/Bench1_11k/Benchmark1_11000.csv"
     threshList = [0.9, 0.9, 0.9, 0.9, 0.8, 0.9, 0.65, 0.1, 0.25, 0.1, 0.25, 0.25, 0.8, 0.8, 0.65, 0.9, 0.9, 0.9, 0.8, 0.9, 0.9, 0.9, 0.8, 0.9, 0.9, 0.8, 0.9, 0.05, 0.05, 0.05, 0.05, 0.05]
-    chunksize = 2200
+    numChunks = 11
+    chunksize = 1000
 elif (datasetName == 'RBF1_40000'):
     datasetPath = "https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/RBF1_40k/RBF1_40000.csv"
     threshList = [0.9, 0.9, 0.65, 0.9, 0.9, 0.8, 0.9, 0.1, 0.25, 0.1, 0.25, 0.25, 0.65, 0.9, 0.9, 0.9, 0.9, 0.9, 0.8, 0.9, 0.9, 0.9, 0.8, 0.9, 0.9, 0.8, 0.9, 0.05, 0.05, 0.05, 0.05, 0.05]
-    chunksize = 8000
+    numChunks = 40
+    chunksize = 1000
 output_path = "".join(("./output/",datasetName,"/"))
 
 Path(output_path).mkdir(exist_ok=True)
@@ -48,7 +44,7 @@ Path(output_path).mkdir(exist_ok=True)
 #new_row = {'Chunk':12, 'Purity':12, 'pCoefficient':12, 'pEntropy':12, 'XieBeni':12}
 #df2 = df.append(new_row, ignore_index=True)
 
-tabRes = pd.DataFrame(np.zeros((32,12)))
+tabRes = pd.DataFrame(np.zeros((32,(numChunks*2)+2)))
 
 for vecIndex, simIDX in enumerate(sm):
     #tabRes = pd.DataFrame(np.zeros((numChunks+4,5)))
@@ -144,10 +140,10 @@ for vecIndex, simIDX in enumerate(sm):
         print(df)
         print("------")
 
-        tabRes.iloc[vecIndex, [0, 2, 4, 6, 8]] = df['XieBeni']
-        tabRes.iloc[vecIndex, [1, 3, 5, 7, 9]] = df['MPC']
-        tabRes.iloc[vecIndex, 10] = df['XieBeni'].mean()
-        tabRes.iloc[vecIndex, 11] = df['MPC'].mean()
+        tabRes.iloc[vecIndex, list(range(0, numChunks*2, 2))] = df['XieBeni']
+        tabRes.iloc[vecIndex, list(range(1, numChunks*2, 2))] = df['MPC']
+        tabRes.iloc[vecIndex, -2] = df['XieBeni'].mean()
+        tabRes.iloc[vecIndex, -1] = df['MPC'].mean()
     
         output = "\n==== Approach ===="
         output = output + str("\n Similarity ="+str(simIDX))
