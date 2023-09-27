@@ -161,7 +161,7 @@ for vecIndex, simIDX in enumerate(sm):
         with open('directOUTPUT.txt', 'a') as f:
             f.write(output)
 
-tabRes.to_excel("".join((output_path,"Example_TableHeloisa_MPC.xlsx")))
+tabRes.to_excel("".join((output_path,"Example_Table.xlsx")))
 #tabRes.to_excel("./output/XieBeni_sm"+str(simIDX)+".xlsx")
 with open('directOUTPUT.txt', 'a') as f:
     f.write("\n------------------------------------------------------------")
