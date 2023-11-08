@@ -22,6 +22,35 @@ def all_online_metrics(fmics, chunksize):
         }
 
 
+def ARI(data):
+    '''
+    data:
+    [[a11, .., a1n, class1, cluster1]
+    ...
+    [am1, .., amn, classm, clusterm]
+    ]
+    '''
+    # FIXME: Maybe just pass the class and cluster arrays
+    classes = data[:, -2]
+    classes_n = np.unique(classes)
+    clusters = data[:, -1]
+    clusters_n = np.unique(clusters)
+
+    comb = lambda n, k: np.math.comb(n, k)
+
+    n = len(data)
+    a = [len(np.where(classes == cla)[0]) for cla in classes_n]
+    b = [len(np.where(clusters == clu)[0]) for clu in clusters_n]
+    nij = [[len(np.where((clusters == clu) & (classes == cla))[0]) for clu in clusters_n] for cla in classes_n]
+    n2 = comb(n, 2)
+    Eai2 = np.sum([comb(ai, 2) for ai in a])
+    Ebj2 = np.sum([comb(bj, 2) for bj in b])
+    Eij2 = np.sum([[comb(n, 2) for n in row] for row in nij])
+    ARI = (Eij2-(Eai2*Ebj2)/n2)/(0.5*(Eai2+Ebj2)-(Eai2*Ebj2)/n2)
+
+    return ARI
+
+
 def FS(x, c, mu, alpha=1):
     '''
     Fuzzy Silhouette
@@ -44,6 +73,7 @@ def FS(x, c, mu, alpha=1):
     '''
     w = [1 for _ in range(len(x))]
     return WFS(x, c, w, mu, alpha)
+
 
 def WFS(x, c, w, mu, alpha=1):
     '''
@@ -112,6 +142,7 @@ def WFS(x, c, w, mu, alpha=1):
     wfs = sum((muijp**alpha)*s*w)/sum((muijp**alpha)*w)
     return wfs
 
+
 def Purity(fmics):
     majorityClass = 0
     totalPoints = 0
@@ -121,12 +152,14 @@ def Purity(fmics):
 
     return (1/totalPoints * majorityClass)
 
+
 def PartitionCoefficient(fmics, chunksize):
     mSquare = 0
     for idxFMIC, fmic in enumerate(fmics):
         mSquare += fmic.mSquare
 
     return (1/chunksize * mSquare)
+
 
 def ModifiedPartitionCoefficient(fmics, chunksize):
     mSquare = 0
@@ -135,12 +168,14 @@ def ModifiedPartitionCoefficient(fmics, chunksize):
 
     return 1 - ((len(fmics)/len(fmics)-1) * (1 - (1/chunksize * mSquare)))
 
+
 def PartitionEntropy(fmics, chunksize):
     mLog = 0
     for idxFMIC, fmic in enumerate(fmics):
         mLog += fmic.mLog
 
     return (- 1/chunksize * mLog)
+
 
 def XieBeni(fmics, chunksize):
     sumaSSD = 0
@@ -155,6 +190,7 @@ def XieBeni(fmics, chunksize):
 
     return (1/chunksize * sumaSSD)/MinDist
 
+
 def FukuyamaSugeno_1(fmics):
     sumaSSD = 0
     centroidList = np.ones((len(fmics), 2))
@@ -168,6 +204,7 @@ def FukuyamaSugeno_1(fmics):
     V1 = np.sum(centroidList/len(fmics), axis=0)
 
     return sumaSSD - np.sum(membershipList * np.linalg.norm(centroidList - V1, axis=1))
+
 
 def FukuyamaSugeno_2(fmics, chunksize):
     sumaSSD = 0
