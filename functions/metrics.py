@@ -147,8 +147,9 @@ def Purity(fmics):
     majorityClass = 0
     totalPoints = 0
     for idxFMIC, fmic in enumerate(fmics):
-        majorityClass += np.max(fmic.sumPointsPerClass)
-        totalPoints += np.sum(fmic.sumPointsPerClass)
+        # Asier: Changed to dict in fmic.py
+        majorityClass += np.max(list(fmic.sumPointsPerClassd.values()))
+        totalPoints += np.sum(list(fmic.sumPointsPerClassd.values()))
 
     return (1/totalPoints * majorityClass)
 

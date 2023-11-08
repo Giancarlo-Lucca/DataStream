@@ -1,4 +1,5 @@
 from math import sqrt
+from collections import defaultdict
 import numpy as np
 
 class FMiC:
@@ -16,7 +17,18 @@ class FMiC:
 
         self.mSquare = 0.0
         self.mLog = 0.0
-        self.sumPointsPerClass = np.zeros(3)
+        # self.sumPointsPerClass = np.zeros(3)   # Asier: Changed to dict
+        self.sumPointsPerClassd = defaultdict(int)
+        # Asier: Shouldn't it start with 1 for the received tag?
+        self.sumPointsPerClassd[tag] += 1
+        # Also for the case of list
+        # if (tag == '1'):
+        #     self.sumPointsPerClass[0] += 1
+        # elif(tag == '2'):
+        #     self.sumPointsPerClass[1] += 1
+        # else:
+        #     self.sumPointsPerClass[2] += 1
+
 
 
         if tag:
@@ -32,14 +44,17 @@ class FMiC:
 
 
         self.mSquare += membership **2
-        self.mLog += membership * np.log(membership)        
+        self.mLog += membership * np.log(membership)
 
-        if (tag == '1'):
-            self.sumPointsPerClass[0] += 1
-        elif(tag == '2'):    
-            self.sumPointsPerClass[1] += 1
-        else:
-            self.sumPointsPerClass[2] += 1
+        self.sumPointsPerClassd[tag] += 1
+
+        # Asier: Changed to dict
+        # if (tag == '1'):
+        #     self.sumPointsPerClass[0] += 1
+        # elif(tag == '2'):
+        #     self.sumPointsPerClass[1] += 1
+        # else:
+        #     self.sumPointsPerClass[2] += 1
 
 
         for idx, value in enumerate(values):
@@ -52,17 +67,20 @@ class FMiC:
         self.__update_radius()
 
     def merge(fmic_a, fmic_b):
-        merged_fmic = FMiC([], None, max(fmic_a.timestamp, fmic_b.timestamp))
+        merged_fmic = FMiC([], np.nan, max(fmic_a.timestamp, fmic_b.timestamp))
         for idx, cf_a in enumerate(fmic_a.cf):
             merged_fmic.cf.append(cf_a + fmic_b.cf[idx])
         merged_fmic.m = fmic_a.m + fmic_b.m
         merged_fmic.ssd = fmic_a.ssd + fmic_b.ssd
         merged_fmic.n = fmic_a.n + fmic_b.n
         merged_fmic.center = fmic_a.center.copy()
+        # Asier: Changed to dict
         #merged_fmic.sumPointsPerClass = fmic_a.sumPointsPerClass + fmic_b.sumPointsPerClass
-        merged_fmic.sumPointsPerClass[0] = fmic_a.sumPointsPerClass[0] + fmic_b.sumPointsPerClass[0]
-        merged_fmic.sumPointsPerClass[1] = fmic_a.sumPointsPerClass[1] + fmic_b.sumPointsPerClass[1]
-        merged_fmic.sumPointsPerClass[2] = fmic_a.sumPointsPerClass[2] + fmic_b.sumPointsPerClass[2]
+        # merged_fmic.sumPointsPerClass[0] = fmic_a.sumPointsPerClass[0] + fmic_b.sumPointsPerClass[0]
+        # merged_fmic.sumPointsPerClass[1] = fmic_a.sumPointsPerClass[1] + fmic_b.sumPointsPerClass[1]
+        # merged_fmic.sumPointsPerClass[2] = fmic_a.sumPointsPerClass[2] + fmic_b.sumPointsPerClass[2]
+        for k in set().union(fmic_a.sumPointsPerClassd.keys(),fmic_b.sumPointsPerClassd.keys()):
+            merged_fmic.sumPointsPerClassd[k] = fmic_a.sumPointsPerClassd[k] + fmic_b.sumPointsPerClassd[k]
         merged_fmic.individualMemberships = np.concatenate((fmic_a.individualMemberships,fmic_b.individualMemberships))
         merged_fmic.values = fmic_a.values + fmic_b.values
 
