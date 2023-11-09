@@ -8,6 +8,7 @@ from d_fuzzstream import DFuzzStreamSummarizer
 from functions.merge import FuzzyDissimilarityMerger
 from functions.distance import EuclideanDistance
 from functions.membership import FuzzyCMeansMembership
+from functions import metrics
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -74,21 +75,26 @@ for simIDX in sm:
                     timestamp += 1
 
                 
-                new_row = pd.DataFrame([["["+str(timestamp)+" to "+str(timestamp + 999)+"]", summarizer.Purity(), summarizer.PartitionCoefficient(), summarizer.PartitionEntropy(), summarizer.XieBeni(), summarizer.ModifiedPartitionCoefficient(), summarizer.FukuyamaSugeno_1(), summarizer.FukuyamaSugeno_2()]], columns=df.columns)
+                # TODO: Obtain al metrics and create the row
+                all_metrics = metrics.all_online_metrics(summarizer.summary(), chunksize)
+                metrics_summary = ""
+                for name, value in all_metrics.items():
+                    metrics_summary += f"{name}: {round(value,3)}\n"
+                metrics_summary = metrics_summary[:-1]
+
+                row_metrics = list(all_metrics.values())
+                row_timestamp = ["["+str(timestamp)+" to "+str(timestamp + 999)+"]"]
+
+                new_row = pd.DataFrame([row_timestamp + row_metrics],
+                                       columns=df.columns)
                 df = pd.concat([df, new_row], ignore_index=True)
                 
                 fhand.write("Total de Fmics = "+str(len(summarizer.summary())))
                 #print("Total de Fmics = "+str(len(summarizer.summary())))
                 for fmic in summarizer.summary():
-                    '''
-                    print("\tTotal pontos classe 0 = " + str(fmic.sumPointsPerClass[0]))
-                    print("\tTotal pontos classe 1 = "+ str(fmic.sumPointsPerClass[1]))
-                    print("\tTotal pontos classe nan = "+ str(fmic.sumPointsPerClass[2]))
-                    print("------------------")
-                    '''
-                    fhand.write("\nTotal pontos classe 0 = " + str(fmic.sumPointsPerClass[0]) + "\n")
-                    fhand.write("\nTotal pontos classe 1 = "+ str(fmic.sumPointsPerClass[1]) + "\n")
-                    fhand.write("\nTotal pontos classe nan = "+ str(fmic.sumPointsPerClass[2]) + "\n")
+                    for k, v in fmic.sumPointsPerClassd.items():  # FIXME: Not sorted, but sorted() has problems with nan
+                        # print(f"Total pontos classe {k} = {v}")
+                        fhand.write(f"\nTotal pontos classe {k} = {v} \n")
                     fhand.write("------------------")
 
                     summary['x'].append(fmic.center[0])
@@ -108,7 +114,7 @@ for simIDX in sm:
                 #plt.legend(["color blue", "color green"], loc ="lower right")
                 #plt.legend(["Purity"+str(summarizer.Purity()),"PartitionCoefficient"+str(summarizer.PartitionCoefficient()),"PartitionEntropy"+str(summarizer.PartitionEntropy()),"XieBeni"+str(summarizer.XieBeni()), "FukuyamaSugeno_1"+str(summarizer.FukuyamaSugeno_1()),"FukuyamaSugeno_2"+str(summarizer.FukuyamaSugeno_2())], bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
                 plt.figtext(.8, .8, "T = 4K")
-                side_text = plt.figtext(.91, .8, "Purity: "+str(round(summarizer.Purity(), 3))+"\nPartitionCoefficient: "+str(round(summarizer.PartitionCoefficient(), 3))+"\nPartitionEntropy: "+str(round(summarizer.PartitionEntropy(), 3))+"\nXieBeni: "+str(round(summarizer.XieBeni(),3))+"\nMPC: "+str(round(summarizer.ModifiedPartitionCoefficient()))+"\nFukuyamaSugeno_1: "+str(round(summarizer.FukuyamaSugeno_1(),3))+"\nFukuyamaSugeno_2: "+str(round(summarizer.FukuyamaSugeno_2(),3)))
+                side_text = plt.figtext(.91, .8, metrics_summary)
                 fig.subplots_adjust(top=1.0)
                 #plt.show()
                 fig.savefig("./Img/[Chunk "+str(timestamp - 1000)+" to "+str(timestamp - 1)+"] Sim("+str(simIDX)+")_Thresh("+str(threshIDX)+").png", bbox_extra_artists=(side_text,), bbox_inches='tight')
