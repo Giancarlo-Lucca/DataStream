@@ -89,7 +89,7 @@ class DFuzzStreamSummarizer:
     # Asier
     def offline(self):
         data = np.array([fm.center.to_list() for fm in self.__fmics])
-        w = [fm.n for fm in self.__fmics]
+        w = [fm.m for fm in self.__fmics]  # Sum of membership
         self._V, self._Vmm = WFCM(data, w, c=self.n_macro_clusters)
 
     def final_clustering(self):
