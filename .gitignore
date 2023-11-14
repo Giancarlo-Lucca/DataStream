@@ -1,5 +1,6 @@
 __pycache*
 .idea*
+.spyproject
 .DS_Store*
 Img/*
 chunkFMICs.txt
