@@ -142,16 +142,23 @@ def WFS(x, c, w, mu, alpha=1):
     wfs = sum((muijp**alpha)*s*w)/sum((muijp**alpha)*w)
     return wfs
 
-
 def Purity(fmics):
-    majorityClass = 0
-    totalPoints = 0
+    partialpur = 0
     for idxFMIC, fmic in enumerate(fmics):
-        # Asier: Changed to dict in fmic.py
-        majorityClass += np.max(list(fmic.sumPointsPerClassd.values()))
-        totalPoints += np.sum(list(fmic.sumPointsPerClassd.values()))
+        majorityClass = max(fmic.tags.values())
+        totalPoints = sum(fmic.tags.values())
+        partialpur += majorityClass/totalPoints
+    return (partialpur/len(fmics))
 
-    return (1/totalPoints * majorityClass)
+# def Purity(fmics):
+#     majorityClass = 0
+#     totalPoints = 0
+#     for idxFMIC, fmic in enumerate(fmics):
+#         # Asier: Changed to dict in fmic.py
+#         majorityClass += np.max(list(fmic.sumPointsPerClassd.values()))
+#         totalPoints += np.sum(list(fmic.sumPointsPerClassd.values()))
+
+#     return (1/totalPoints * majorityClass)
 
 
 def PartitionCoefficient(fmics, chunksize):

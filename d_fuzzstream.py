@@ -78,9 +78,9 @@ class DFuzzStreamSummarizer:
             for idx, fmic in enumerate(self.__fmics):
                 fmic.assign(values, tag, memberships[idx], distance_from_fmics[idx])
             self.metrics['absorptions'] += 1
-            number_of_fmics = len(self.__fmics)
-            self.__fmics = self.__merge_function(self.__fmics, self.merge_threshold, self.__memberships)
-            self.metrics['merges'] += number_of_fmics - len(self.__fmics)
+        number_of_fmics = len(self.__fmics)
+        self.__fmics = self.__merge_function(self.__fmics, self.merge_threshold, self.__memberships)
+        self.metrics['merges'] += number_of_fmics - len(self.__fmics)
 
         # Asier: Update the actual clusters
         if timestamp % self.time_gap == 0:
