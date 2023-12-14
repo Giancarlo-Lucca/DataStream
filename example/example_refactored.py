@@ -27,12 +27,12 @@ min_fmics = 5
 max_fmics = 100
 thresh = 0.5
 threshIDX = 0.8
-chunksize = 20
+chunksize = 1000
 color = {'1': 'Red', '2': 'Blue', '3': 'Green', '4': 'pink', 'nan': 'Gray'}
 figure = plt.figure()
 scatter = plt.scatter('x', 'y', s='radius', data={'x': [], 'y': [], 'radius': []})
 
-datasetName = 'RBF1_40000' # Benchmark1_11000, RBF1_40000, 'DS1' # 
+datasetName = 'Benchmark1_11000' # Benchmark1_11000, RBF1_40000, 'DS1' #
 
 if (datasetName == 'Benchmark1_11000'):
     datasetPath = "https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/Bench1_11k/Benchmark1_11000.csv"
@@ -57,7 +57,7 @@ summarizer = DFuzzStreamSummarizer(
     merge_function=FuzzyDissimilarityMerger(sm, max_fmics).merge,
     membership_function=FuzzyCMeansMembership.memberships,
     chunksize = chunksize,
-    n_macro_clusters=20,
+    n_macro_clusters=2,
     time_gap=10000, # Asier: When to apply the WFCM
 )
 

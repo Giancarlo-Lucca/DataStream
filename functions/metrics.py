@@ -22,33 +22,70 @@ def all_online_metrics(fmics, chunksize):
         }
 
 
-def ARI(data):
+def all_offline_metrics(cluster_centers, membership_matrix, fmics):
+    classes = np.array([max(fm.tags) for fm in fmics])
+    clusters = np.argmax(membership_matrix, axis=0)
+    points = np.array([fm.center for fm in fmics])
+    return {
+        "Purity": offline_purity(membership_matrix),
+        "ARI": ARI(classes, clusters),
+        "FS": FS(points, cluster_centers, membership_matrix)
+        }
+
+
+def ARI(classes, clusters):
     '''
-    data:
-    [[a11, .., a1n, class1, cluster1]
-    ...
-    [am1, .., amn, classm, clusterm]
-    ]
+    Adjusted Rand Index
+
+    Parameters
+    ----------
+    classes : Array
+        Array with the class of each example.
+    clusters : Array
+        Array with the cluster asigned to each example.
+
+    Returns
+    -------
+    ARI : Float
+        Adjusted Rand Index.
+
     '''
-    # FIXME: Maybe just pass the class and cluster arrays
-    classes = data[:, -2]
     classes_n = np.unique(classes)
-    clusters = data[:, -1]
     clusters_n = np.unique(clusters)
 
-    comb = lambda n, k: np.math.comb(n, k)
-
-    n = len(data)
+    n = len(classes)
     a = [len(np.where(classes == cla)[0]) for cla in classes_n]
     b = [len(np.where(clusters == clu)[0]) for clu in clusters_n]
-    nij = [[len(np.where((clusters == clu) & (classes == cla))[0]) for clu in clusters_n] for cla in classes_n]
-    n2 = comb(n, 2)
-    Eai2 = np.sum([comb(ai, 2) for ai in a])
-    Ebj2 = np.sum([comb(bj, 2) for bj in b])
-    Eij2 = np.sum([[comb(n, 2) for n in row] for row in nij])
-    ARI = (Eij2-(Eai2*Ebj2)/n2)/(0.5*(Eai2+Ebj2)-(Eai2*Ebj2)/n2)
+    nij = [[len(np.where((clusters == clu) & (classes == cla))[0])
+            for clu in clusters_n]
+           for cla in classes_n]
+    n2 = np.math.comb(n, 2)
+    Eai2 = np.sum([np.math.comb(ai, 2) for ai in a])
+    Ebj2 = np.sum([np.math.comb(bj, 2) for bj in b])
+    Eij2 = np.sum([[np.math.comb(n, 2) for n in row] for row in nij])
+    ARI = (Eij2 - (Eai2 * Ebj2) / n2) / (0.5 * (Eai2 + Ebj2) - (Eai2 * Ebj2) / n2)
 
     return ARI
+
+
+def offline_purity(memebership_matrix):
+    '''
+    Purity
+
+    Parameters
+    ----------
+    memebership_matrix: Array
+        Matrix with the membership of each example to each cluster
+
+    Returns
+    -------
+    Purity : Float
+        Purity.
+    '''
+    max_memb = np.max(memebership_matrix, axis=0)
+    tot_memb = np.sum(memebership_matrix, axis=0)
+    purity = np.sum(max_memb / tot_memb) / len(max_memb)
+    return purity
 
 
 def FS(x, c, mu, alpha=1):
@@ -101,7 +138,7 @@ def WFS(x, c, w, mu, alpha=1):
     nc = len(c)
     dist = np.zeros([n, nc])
     for i in range(nc):
-        dist[:, i] = np.sqrt(np.sum((x-c[i, :])**2, axis=1))  # Euclidean
+        dist[:, i] = np.sqrt(np.sum((x - c[i, :])**2, axis=1).astype('float'))  # Euclidean
     labels = np.argmin(dist, axis=1)
     NC = [sum(labels == i) for i in range(nc)]  # points per cluster
     dm = np.zeros([n, n])
@@ -119,7 +156,7 @@ def WFS(x, c, w, mu, alpha=1):
         for j in same_cluster_idx:
             if i != j:
                 aij += dm[i, j]
-        aij = aij/(NC[cluster]-1)
+        aij = aij / (NC[cluster] - 1)
 
         # bij
         bij = []
@@ -129,36 +166,27 @@ def WFS(x, c, w, mu, alpha=1):
                 other_cluster_idx = np.argwhere(labels == p)[:, 0]
                 for j in other_cluster_idx:
                     bij[-1] += dm[i, j]
-                bij[-1] = bij[-1]/NC[p]
+                bij[-1] = bij[-1] / NC[p]
         bij = min(bij)
 
-        si = (bij - aij)/max(aij, bij)
+        si = (bij - aij) / max(aij, bij)
         s.append(si)
 
     # https://www.w3resource.com/python-exercises/numpy/advanced-numpy-exercise-11.php
     second_largest = np.partition(mu, -2, axis=0)
     muijp = second_largest[-1] - second_largest[-2]
 
-    wfs = sum((muijp**alpha)*s*w)/sum((muijp**alpha)*w)
+    wfs = sum((muijp**alpha) * s * w) / sum((muijp**alpha) * w)
     return wfs
+
 
 def Purity(fmics):
     partialpur = 0
     for idxFMIC, fmic in enumerate(fmics):
         majorityClass = max(fmic.tags.values())
         totalPoints = sum(fmic.tags.values())
-        partialpur += majorityClass/totalPoints
-    return (partialpur/len(fmics))
-
-# def Purity(fmics):
-#     majorityClass = 0
-#     totalPoints = 0
-#     for idxFMIC, fmic in enumerate(fmics):
-#         # Asier: Changed to dict in fmic.py
-#         majorityClass += np.max(list(fmic.sumPointsPerClassd.values()))
-#         totalPoints += np.sum(list(fmic.sumPointsPerClassd.values()))
-
-#     return (1/totalPoints * majorityClass)
+        partialpur += majorityClass / totalPoints
+    return (partialpur / len(fmics))
 
 
 def PartitionCoefficient(fmics, chunksize):
@@ -166,7 +194,7 @@ def PartitionCoefficient(fmics, chunksize):
     for idxFMIC, fmic in enumerate(fmics):
         mSquare += fmic.mSquare
 
-    return (1/chunksize * mSquare)
+    return (1 / chunksize * mSquare)
 
 
 def ModifiedPartitionCoefficient(fmics, chunksize):
@@ -174,7 +202,7 @@ def ModifiedPartitionCoefficient(fmics, chunksize):
     for idxFMIC, fmic in enumerate(fmics):
         mSquare += fmic.mSquare
 
-    return 1 - ((len(fmics)/len(fmics)-1) * (1 - (1/chunksize * mSquare)))
+    return 1 - ((len(fmics) / len(fmics) - 1) * (1 - (1 / chunksize * mSquare)))
 
 
 def PartitionEntropy(fmics, chunksize):
@@ -182,12 +210,12 @@ def PartitionEntropy(fmics, chunksize):
     for idxFMIC, fmic in enumerate(fmics):
         mLog += fmic.mLog
 
-    return (- 1/chunksize * mLog)
+    return (-1 / chunksize * mLog)
 
 
 def XieBeni(fmics, chunksize):
     sumaSSD = 0
-    centroidList = np.ones((len(fmics), 2))*1000000
+    centroidList = np.ones((len(fmics), 2)) * 1000000
     menorDistancia = 1000000
     # storing the distances among all Fmics
     for idxFMIC, fmic in enumerate(fmics):
@@ -196,7 +224,7 @@ def XieBeni(fmics, chunksize):
 
     MinDist = np.min(np.linalg.norm(centroidList, axis=1))
 
-    return (1/chunksize * sumaSSD)/MinDist
+    return (1 / chunksize * sumaSSD) / MinDist
 
 
 def FukuyamaSugeno_1(fmics):
@@ -209,7 +237,7 @@ def FukuyamaSugeno_1(fmics):
         centroidList[idxFMIC, :] = fmic.center
         membershipList[idxFMIC] = fmic.m
 
-    V1 = np.sum(centroidList/len(fmics), axis=0)
+    V1 = np.sum(centroidList / len(fmics), axis=0)
 
     return sumaSSD - np.sum(membershipList * np.linalg.norm(centroidList - V1, axis=1))
 
@@ -224,7 +252,7 @@ def FukuyamaSugeno_2(fmics, chunksize):
         sumaSSD += fmic.ssd
         centroidList[idxFMIC, :] = fmic.center
         membershipList[idxFMIC] = fmic.m
-        sumaValues += 1/chunksize * fmic.values
+        sumaValues += 1 / chunksize * fmic.values
 
     V2 = sumaValues
 

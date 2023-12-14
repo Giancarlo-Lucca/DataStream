@@ -75,7 +75,7 @@ anim = FuncAnimation(
     init_func=lambda: None
 )
 
-writer_gif = PillowWriter(fps=60)
+writer_gif = PillowWriter(fps=1)
 
 anim.save("summary_sm_"+str(idxSimilarity)+"th_"+str(thresh)+".gif", writer=writer_gif)
 
