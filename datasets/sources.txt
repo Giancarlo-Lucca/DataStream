@@ -1,0 +1,55 @@
+DS1: 4C2D800Linear
+https://citius.usc.es/investigacion/datasets/gaussianmotiondata
+@article{MARQUEZ201816,
+title = "A novel and simple strategy for evolving prototype based clustering",
+journal = "Pattern Recognition",
+volume = "82",
+pages = "16 - 30",
+year = "2018",
+issn = "0031-3203",
+doi = "https://doi.org/10.1016/j.patcog.2018.04.020",
+url = "http://www.sciencedirect.com/science/article/pii/S0031320318301547",
+author = "David G. Márquez and Abraham Otero and Paulo Félix and Constantino A. García",
+keywords = "Evolving clustering, Data stream, Concept drift, Gaussian mixture models, K-means, Cluster evolution"
+}
+
+DS2:
+
+RBF:
+https://github.com/CIG-UFSCar/DS_Datasets/
+
+Banana:
+https://github.com/deric/clustering-benchmark/blob/master/src/main/resources/datasets/artificial/banana.arff
+
+Sensor:
+PowerSupply:
+HyperPlane:
+https://www.cse.fau.edu/~xqzhu/stream.html
+
+Covertype:
+@misc{misc_covertype_31,
+  author       = {Blackard,Jock},
+  title        = {{Covertype}},
+  year         = {1998},
+  howpublished = {UCI Machine Learning Repository},
+  note         = {{DOI}: https://doi.org/10.24432/C50K5N}
+}
+
+Insects:
+@article{SouzaChallenges:2020,
+     title={Challenges in Benchmarking Stream Learning Algorithms with Real-world Data},
+     author={Souza, V. M. A. and Reis, D. M. and Maletzke, A. G. and Batista, G. E. A. P. A.},
+     journal={Data Mining and Knowledge Discovery},
+     pages={1805-1858},
+     volume={34},
+     year={2020},
+     doi={10.1007/s10618-020-00698-5}
+}
+
+NOAA:
+Incremental learning of concept drift from streaming imbalanced data,
+in IEEE Transactions on Knowledge & Data Engineering, 2013, vol. 25, no. 10, pp. 2283-2301.
+by G. Ditzler and R. Polikar,  
+
+Incremental Learning of Concept Drift in Nonstationary Environments, 
+by Ryan Elwell and Robi Polikar.

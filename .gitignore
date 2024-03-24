@@ -3,6 +3,7 @@ __pycache*
 .spyproject
 .DS_Store*
 Img/*
+output/*
 chunkFMICs.txt
 directOUTPUT.txt
 
