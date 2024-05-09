@@ -13,38 +13,11 @@ author = "David G. Márquez and Abraham Otero and Paulo Félix and Constantino A
 keywords = "Evolving clustering, Data stream, Concept drift, Gaussian mixture models, K-means, Cluster evolution"
 }
 
-DS2:
-
 RBF:
 https://github.com/CIG-UFSCar/DS_Datasets/
 
-Banana:
-https://github.com/deric/clustering-benchmark/blob/master/src/main/resources/datasets/artificial/banana.arff
-
-Sensor:
 PowerSupply:
-HyperPlane:
 https://www.cse.fau.edu/~xqzhu/stream.html
-
-Covertype:
-@misc{misc_covertype_31,
-  author       = {Blackard,Jock},
-  title        = {{Covertype}},
-  year         = {1998},
-  howpublished = {UCI Machine Learning Repository},
-  note         = {{DOI}: https://doi.org/10.24432/C50K5N}
-}
-
-Insects:
-@article{SouzaChallenges:2020,
-     title={Challenges in Benchmarking Stream Learning Algorithms with Real-world Data},
-     author={Souza, V. M. A. and Reis, D. M. and Maletzke, A. G. and Batista, G. E. A. P. A.},
-     journal={Data Mining and Knowledge Discovery},
-     pages={1805-1858},
-     volume={34},
-     year={2020},
-     doi={10.1007/s10618-020-00698-5}
-}
 
 NOAA:
 Incremental learning of concept drift from streaming imbalanced data,
