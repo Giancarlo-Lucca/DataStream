@@ -7,14 +7,15 @@ Created on Thu Mar  7 14:59:50 2024
 """
 
 import argparse
-import os
+# import os
 import sys
-sys.path.append(os.path.abspath(os.path.join("../scluster", "..")))
+# sys.path.append(os.path.abspath(os.path.join("../scluster", "..")))
+from pathlib import Path
+sys.path.append(Path.cwd().parent)
 import math
 import statistics
 from river import cluster
 from river import stream
-from scluster.riv_clustream_mod import CluStream2
 import pandas as pd
 from sklearn.metrics import silhouette_score,adjusted_rand_score
 
@@ -28,23 +29,11 @@ def clu_stream_gen(n_classes, chunksize):
                 n_macro_clusters=n_classes,
                 max_micro_clusters=mmc,
                 time_gap=chunksize,
+                time_window=chunksize,
                 halflife=hl
             )
             yield clustream, [mmc, hl]
 
-
-def clu_stream_gen_mod(n_classes, chunksize):
-    maxmcs = [50, 100, 200]
-    halflifes = [0.1, 0.2, 0.4, 0.5, 0.8, 1]
-    for mmc in maxmcs:
-        for hl in halflifes:
-            clustream = CluStream2(
-                n_macro_clusters=n_classes,
-                max_micro_clusters=mmc,
-                time_gap=chunksize,
-                halflife=hl
-            )
-            yield clustream, [mmc, hl]
 
 
 def db_stream_gen(n_classes=None, chunksize=None):
@@ -125,18 +114,15 @@ def run(algorithm, datasetPath, chunksize):
     points = []
     timestamp = 0
     with pd.read_csv(datasetPath,
-                     dtype={"X1": float, "X2": float, "class": str},
+                     dtype={ "class": str},
                      chunksize=chunksize) as reader:
         timestamp = 1
         for chunk in reader:
-            # print(f"Summarizing examples from {timestamp} to {timestamp + chunksize - 1}")
             for index, example in chunk.iterrows():
-                X = example[["X1", "X2"]].to_dict()
-                C = example[["class"]].to_dict()
+                X = example[example.index[0:-1]].to_dict()
+                C = example[example.index[[-1]]].to_dict()
                 classes.append(C)
                 points.append(X)
-                # if timestamp==51:
-                #     print(timestamp, X)
                 algorithm.learn_one(X)
 
                 if timestamp % chunksize == 0:
@@ -149,6 +135,7 @@ def run(algorithm, datasetPath, chunksize):
                         Y.append(-1 if math.isnan(float(YTest.get("class"))) else YTest.get("class"))
 
                     ARI.append(adjusted_rand_score(Y, YC))
+                    print(ARI[-1])
 
                     classes = []
                     points = []
@@ -172,11 +159,17 @@ def main(algorithm, dataset):
         n_classes = 4
         chunksize = 100
         numChunks = 8
+    elif dataset == "powersupply":
+        n_classes = 24
+        chunksize = 1000
+        numChunks = 29
+    elif dataset == "NOAA":
+        n_classes = 2
+        chunksize = 1000
+        numChunks = 18
 
     if algorithm == "clustream":
         alg = clu_stream_gen
-    elif algorithm == "clustream_mod":
-        alg = clu_stream_gen_mod
     elif algorithm == "dbstream":
         alg = db_stream_gen
     elif algorithm == "denstream":
@@ -190,7 +183,6 @@ def main(algorithm, dataset):
     best_params =  []
     for alg, params in alg(n_classes, chunksize):
         ari_i = run(alg,datasetPath, chunksize)
-        # print(ari_i, params)
 
         if ari_i > best:
             best = ari_i
@@ -200,49 +192,7 @@ def main(algorithm, dataset):
     print(f"# {algorithm},{dataset},{best:.4f},{best_params=}")
 
     with open("../output/results_river_tune.csv", "a") as rfile:
-        rfile.write(f"# {algorithm},{dataset},{best:.4f},{best_params=}")
-
-
-
-def main_all():
-    datasets = ["Benchmark1_11000","RBF1_40000","DS1"]
-
-    params = {
-        'converters': {'X': float, 'Y': float, 'C': int}
-    }
-
-    for i, dataset in enumerate(datasets):
-        datasetPath = f"datasets/{dataset}.csv"
-
-
-        if i == 0:
-            n_classes = 2
-            chunksize = 1000
-            numChunks = 11
-            continue
-        elif i == 1:
-            n_classes = 3
-            chunksize = 1000
-            numChunks = 40
-            # continue
-        elif i == 2:
-            n_classes = 4
-            chunksize = 100
-            numChunks = 8
-
-
-        best = 0
-        best_params =  []
-        for alg, params in clu_stream_gen(n_classes, chunksize):
-            ari_i = run(alg,datasetPath, chunksize)
-            print(ari_i, params)
-
-            if ari_i > best:
-                best = ari_i
-                best_params = params
-
-        print(dataset)
-        print(f"Best result {best:.2f}. For {best_params=}")
+        rfile.write(f"\n# {algorithm},{dataset},{best:.4f},{best_params=}")
 
 
 if __name__ == "__main__":

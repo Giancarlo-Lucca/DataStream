@@ -56,7 +56,7 @@ color = {'1': 'Red', '2': 'Blue', '3': 'Green', '4': 'Pink', 'nan': 'Gray'}
 figure = plt.figure()
 scatter = plt.scatter('x', 'y', s='radius', data={'x': [], 'y': [], 'radius': []})
 
-datasetName = 'Gaussian_4C2D800'  # 'Benchmark1_11000', 'RBF1_40000', 'Gaussian_4C2D800'
+datasetName = 'Benchmark1_11000'  # 'Benchmark1_11000', 'RBF1_40000'
 
 if (datasetName == 'Benchmark1_11000'):
     datasetPath = "https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/Bench1_11k/Benchmark1_11000.csv"
@@ -68,11 +68,7 @@ elif (datasetName == 'RBF1_40000'):
     numChunks = 10
     chunksize = 1000
     n_macro_clusters = 3
-elif (datasetName == 'Gaussian_4C2D800'):
-    datasetPath = "../datasets/DS1.csv"
-    numChunks = 8
-    chunksize = 100
-    n_macro_clusters = 4
+
 output_path = "".join(("../output/", datasetName, "/"))
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -84,14 +80,13 @@ df = pd.DataFrame(columns=['SimMeasure', 'Threshold', 'StartChunk',
                            'EndChunk', 'Creations', 'Absorptions', 'Removals',
                            'Merges', 'Purity', 'pCoefficient', 'pEntropy',
                            'XieBeni', 'MPC', 'FukuyamaSugeno_1',
-                           'FukuyamaSugeno_2', 'Silhouette'])  # 'ARI','Silhouette'])
+                           'FukuyamaSugeno_2', 'Silhouette'])
 for simIDX in sm:
     for thNum, threshIDX in enumerate(threshList):
         summarizer = DFuzzStreamSummarizer(
             max_fmics=max_fmics,
             distance_function=EuclideanDistance.distance,
             merge_threshold=threshIDX,
-            # merge_function=FuzzyDissimilarityMerger(simIDX, threshIDX, max_fmics).merge,
             merge_function=AllMergers[simIDX](simIDX, threshIDX, max_fmics),
             membership_function=FuzzyCMeansMembership.memberships,
             chunksize=chunksize,
@@ -111,17 +106,16 @@ for simIDX in sm:
                 print(f"Summarizing examples from {timestamp} to {timestamp + chunksize - 1} -> sim {simIDX} and thrsh {threshIDX}")
                 for index, example in chunk.iterrows():
                     # Summarizing example
-                    summarizer.summarize(example[0:2], int(example[2]), timestamp)
+                    summarizer.summarize(example[0:-1], int(example[-1]), timestamp)
                     timestamp += 1
 
                 ari, sil = metrics.offline_stats(summarizer, chunk)
 
                 print(f"Offline ARI for {timestamp}: {ari}")
-                # print(f"Offline F1 for {timestamp}: {f1}")
                 print(f"Offline silhouette for {timestamp}: {sil}")
                 print(f">> {timestamp},{sil:.5f},{ari:.5f}")
 
-                # TODO: Obtain al metrics and create the row
+                # Obtain al metrics and create the row
                 all_metrics = metrics.all_online_metrics(summarizer.summary(), chunksize)
                 metrics_summary = ""
                 for name, value in all_metrics.items():
@@ -135,20 +129,16 @@ for simIDX in sm:
                 # Silhouete
                 fmics = [fmic.center.to_list() for fmic in summarizer.summary()]
                 data = cluster_data(chunk, summarizer._V, fmics)
-                # ari = adjusted_rand_score(data[:,-2],data[:,-1])
                 sil = silhouette_score(data[:, :-2], data[:, -1])
-                # print(timestamp, f"{ari=}, {sil=}")
 
-                row_s = [sil]  # row_s = [ari, sil]
+                row_s = [sil]
 
                 new_row = pd.DataFrame([row_timestamp + row_m + row_metrics + row_s],
                                        columns=df.columns)
                 df = pd.concat([df, new_row], ignore_index=True)
 
-                # print("Total de Fmics = "+str(len(summarizer.summary())))
+                
                 for fmic in summarizer.summary():
-                    # for k, v in fmic.sumPointsPerClassd.items():  # FIXME: Not sorted, but sorted() has problems with nan
-                        # print(f"Total pontos classe {k} = {v}")
 
                     summary['x'].append(fmic.center.iloc[0])
                     summary['y'].append(fmic.center.iloc[1])
@@ -158,20 +148,6 @@ for simIDX in sm:
 
                 if not os.path.isdir(f"{output_path}Img/"):
                     os.mkdir(f"{output_path}Img/")
-
-                # fig = plt.figure()
-                # # Plot radius
-                # plt.scatter('x', 'y', s='radius', color='color', data=summary, alpha=0.1)
-                # # Plot centroids
-                # plt.scatter('x', 'y', s=1, color='color', data=summary)
-                # # plt.legend(["color blue", "color green"], loc ="lower right")
-                # # plt.legend(["Purity"+str(summarizer.Purity()),"PartitionCoefficient"+str(summarizer.PartitionCoefficient()),"PartitionEntropy"+str(summarizer.PartitionEntropy()),"XieBeni"+str(summarizer.XieBeni()), "FukuyamaSugeno_1"+str(summarizer.FukuyamaSugeno_1()),"FukuyamaSugeno_2"+str(summarizer.FukuyamaSugeno_2())], bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-                # plt.figtext(.8, .8, "T = 4K")
-                # side_text = plt.figtext(.91, .8, metrics_summary)
-                # fig.subplots_adjust(top=1.0)
-                # # plt.show()
-                # fig.savefig(f"f"{output_path}Img/[Chunk "+str(timestamp - chunksize)+" to "+str(timestamp - 1)+"] Sim("+str(simIDX)+")_Thresh("+str(threshIDX)+").png", bbox_extra_artists=(side_text,), bbox_inches='tight')
-                # plt.close()
 
 
             # Transforming FMiCs into dataframe
@@ -195,5 +171,5 @@ for simIDX in sm:
             print("------")
 
 
-        df.to_excel("".join((output_path, "summary_and_metrics_" + datasetName + "26-02-cont.xlsx")))
+        df.to_excel("".join((output_path, "summary_and_metrics_" + datasetName + ".xlsx")))
 print("--- End of execution --- ")
