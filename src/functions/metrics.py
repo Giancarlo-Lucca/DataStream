@@ -59,7 +59,10 @@ def offline_stats(summarizer, chunk):
     # ari = adjusted_rand_score(y[not_nans], y_h[not_nans])
     ari = adjusted_rand_score(y, y_h)
     # f1 = f1_score(y, y_h)
-    sil = silhouette_score(chunk[chunk.columns[:-1]].values, y_h)
+    if len(np.unique(y_h))==1:
+        sil = 0
+    else:
+        sil = silhouette_score(chunk[chunk.columns[:-1]].values, y_h)
 
     return ari, sil
 
