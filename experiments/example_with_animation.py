@@ -1,14 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
-
 import os, sys
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
-
+sys.path.append(os.path.abspath("."))
 from src.d_fuzzstream import DFuzzStreamSummarizer
-from src.functions.merge import FuzzyDissimilarityMerger
+from src.functions.merge import AllMergers
 from src.functions.distance import EuclideanDistance
 from src.functions.membership import FuzzyCMeansMembership
 
@@ -17,12 +13,10 @@ min_fmics = 5
 max_fmics = 100
 thresh = 1.2
 
-
-
 summarizer = DFuzzStreamSummarizer(
     distance_function=EuclideanDistance.distance,
     merge_threshold = thresh,
-    merge_function=FuzzyDissimilarityMerger(idxSimilarity,thresh, max_fmics).merge,
+    merge_function=AllMergers[idxSimilarity](idxSimilarity, thresh, max_fmics),
     membership_function=FuzzyCMeansMembership.memberships,
 )
 

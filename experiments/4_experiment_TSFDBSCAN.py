@@ -8,8 +8,7 @@ Created on Wed Nov 29 10:56:54 2023
 from pathlib import Path
 import os
 import sys
-sys.path.append(os.path.abspath( ".."))
-sys.path.append(Path.cwd().parent)
+sys.path.append(os.path.abspath("."))
 import argparse
 import numpy as np
 import pandas as pd
@@ -196,8 +195,6 @@ if __name__ == "__main__":
     dataset_params["outputPath"] =  currentPath / "output" / dataset_name.split(".")[0]
     dataset_params["dtypes"] = {"class": str}
     # dtypes = {"X1": float, "X2": float, "class": str}
-
-
 
     emin = [args.emin]
     emax = [args.emax]

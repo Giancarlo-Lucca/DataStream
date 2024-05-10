@@ -1,6 +1,7 @@
 # Experimental d-FuzzStream: Dispersion-Based Fuzzy Data Stream Clustering
 
-Implementation of the fuzzy data stream clustering algorithm from the article [d-FuzzStream: A Dispersion-Based Fuzzy Data Stream Clustering](https://ieeexplore.ieee.org/document/8491534).
+Implementation of the fuzzy data stream clustering algorithm from the article [Data stream clustering: introducing recursively
+extendable aggregation functions for incremental cluster fusion processes](https://ieeexplore.ieee.org/).
 Original Python implementation, as well as, additional information can be found in this [repo](https://github.com/Xicks/d-FuzzStream).
 
 This implementation facilitates experiments over the original implementation because of the following aspects:
@@ -27,6 +28,11 @@ Colors (Blue, Red and Grey) represent their classes.
 ## Requirements
 
 - [Python 3](https://www.python.org/downloads/)
+- [Pandas](https://pandas.pydata.org)
+- [Numpy](https://numpy.org)
+- [matplotlib](https://matplotlib.org)
+- [openpyxl](https://openpyxl.readthedocs.io)
+- [scikit-learn](https://scikit-learn.org)
 
 To run examples and generate graphics:
 - [Pandas](https://pandas.pydata.org/docs/getting_started/install.html)
@@ -40,29 +46,6 @@ Follow the original implementation steps with the addition of three parameters:
 
 All options have default values.
 
-Example on how to change functions:
-```python
-from d_fuzzstream import DFuzzStreamSummarizer
-
-
-class ExampleFunction:
-  def memberships(distances, fuzzy_factor):
-    # Do Something
-    return []
-    
-def merge_function(fmics, threshold):
-  # Do Something
-  return fmics
-
-summarizer = DFuzzStreamSummarizer(
-  # Using lambda
-  distance_function=lambda v1, v2: v1 - v2,
-  # Using class method
-  membership_function=ExampleFunction.memberships,
-  # Using function
-  merge_function=merge_function
-)
-```
 
 To summarize examples, passes one example at a time to summarizer with its respective tag and timestamp.
 ```python
@@ -97,9 +80,9 @@ summarizer.metrics
 ## How to run examples
 Simple example, without animation:
 ```commandline
-python3 example/example.py
+python3 experiments/example.py
 ```
 Example with animation:
 ```commandline
-python3 example/example_with_animation.py
+python3 experiments/example_with_animation.py
 ```

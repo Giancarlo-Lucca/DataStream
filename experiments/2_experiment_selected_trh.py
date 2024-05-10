@@ -6,9 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
-sys.path.append(Path.cwd().parent)
-sys.path.append(Path.cwd())
-sys.path.append(os.path.abspath( ".."))
+sys.path.append(os.path.abspath("."))
 from src.d_fuzzstream import DFuzzStreamSummarizer
 from src.functions.merge import FuzzyDissimilarityMerger
 from src.functions.merge import AllMergers
@@ -49,7 +47,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 currentPath = Path.cwd()
 output_path = currentPath / "output"/ datasetName
-Path(output_path).mkdir(exist_ok=True)
+Path(output_path).mkdir(parents=True,exist_ok=True)
 
 tabRes = pd.DataFrame(np.zeros((32, (numChunks * 3) + 3)))
 
@@ -72,7 +70,7 @@ for vecIndex, simIDX in enumerate(sm[start:end]):
     summary = {'x': [], 'y': [], 'radius': [], 'color': [], 'weight': [], 'class': []}
     timestamp = 0
 
-    fhand = open(f'{output_path}chunkFMICs.txt', 'a')
+    fhand = open(f'{output_path}/chunkFMICs.txt', 'a')
 
     # Read files in chunks
     with pd.read_csv(datasetPath,
@@ -183,7 +181,7 @@ for vecIndex, simIDX in enumerate(sm[start:end]):
         output = output + str("\n " + df.to_markdown(tablefmt='greed'))
         output = output + str("\n *****")
         df = df[0:0]
-        with open(f'{output_path}directOUTPUT.txt', 'a') as f:
+        with open(f'{output_path}/directOUTPUT.txt', 'a') as f:
             f.write(output)
 
 

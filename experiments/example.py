@@ -7,15 +7,12 @@ Created on Sun Oct 22 09:27:46 2023
 """
 import os, sys
 from pathlib import Path
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
-
+sys.path.append(os.path.abspath("."))
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from src.d_fuzzstream import DFuzzStreamSummarizer
-from src.functions.merge import FuzzyDissimilarityMerger
+from src.functions.merge import AllMergers
 from src.functions.distance import EuclideanDistance
 from src.functions.membership import FuzzyCMeansMembership
 from src.functions import metrics
@@ -25,8 +22,7 @@ from src.functions import metrics
 sm = 1
 min_fmics = 5
 max_fmics = 100
-thresh = 0.5
-threshIDX = 0.8
+thresh = 0.8
 chunksize = 1000
 color = {'1': 'Red', '2': 'Blue', '3': 'Green', '4': 'pink', 'nan': 'Gray'}
 figure = plt.figure()
@@ -43,28 +39,36 @@ elif (datasetName == 'RBF1_40000'):
 elif (datasetName == 'DS1'):
     datasetPath = "SamplesFile_b_4C2D800Linear.csv"
     numChunks = 40
-output_path = "".join(("../output/",datasetName,"/"))
 
-
-# Path(output_path).mkdir(exist_ok=True)
-
-
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+currentPath = Path.cwd()
+output_path = currentPath / "output"/ datasetName
+Path(output_path).mkdir(parents=True,exist_ok=True)
 
 df = pd.DataFrame(columns = ['Chunk', 'Purity', 'pCoefficient', 'pEntropy', 'XieBeni','MPC','FukuyamaSugeno_1','FukuyamaSugeno_2'])
 summarizer = DFuzzStreamSummarizer(
     distance_function=EuclideanDistance.distance,
-    merge_threshold = threshIDX,
-    merge_function=FuzzyDissimilarityMerger(sm, threshIDX, max_fmics).merge,
+    merge_threshold = thresh,
+    merge_function=AllMergers[sm](sm, thresh, max_fmics),
     membership_function=FuzzyCMeansMembership.memberships,
     chunksize = chunksize,
     n_macro_clusters=2,
-    time_gap=10000, # Asier: When to apply the WFCM
+    time_gap=10000,
 )
 
 summary = {'x': [], 'y': [], 'radius' : [], 'color': [], 'weight': [], 'class': []}
 timestamp = 0
 
-fhand = open('chunkFMICs.txt', 'a')
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+currentPath = Path.cwd()
+output_path = currentPath / "output"/ datasetName
+Path(output_path).mkdir(parents=True,exist_ok=True)
+
+fhand = open(output_path / 'chunkFMICs.txt', 'a')
 
 # Read files in chunks
 with pd.read_csv(datasetPath,
@@ -73,11 +77,11 @@ with pd.read_csv(datasetPath,
                 dtype={"X1": float, "X2": float, "class": str},
                 chunksize=chunksize) as reader:
     for chunk in reader:
-        print(f"Summarizing examples from {timestamp} to {timestamp + 999} -> sim {sm} and thrsh {threshIDX}")
-        fhand.write(f"Summarizing examples from {timestamp} to {timestamp + 999} -> sim {sm} and thrsh {threshIDX}\n")
+        print(f"Summarizing examples from {timestamp} to {timestamp + 999} -> sim {sm} and thrsh {thresh}")
+        fhand.write(f"Summarizing examples from {timestamp} to {timestamp + 999} -> sim {sm} and thrsh {thresh}\n")
         for index, example in chunk.iterrows():
             # Summarizing example
-            summarizer.summarize(example[0:2], example[2], timestamp)  # FIXME: Asier for int tags
+            summarizer.summarize(example[0:2], example[2], timestamp)
             timestamp += 1
         summarizer.offline()
 
@@ -97,10 +101,9 @@ with pd.read_csv(datasetPath,
         df = pd.concat([df, new_row], ignore_index=True)
 
         fhand.write("Total de Fmics = "+str(len(summarizer.summary())))
-        # print("Total de Fmics = "+str(len(summarizer.summary())))
+        
         for fmic in summarizer.summary():
-            for k, v in fmic.sumPointsPerClassd.items():  # FIXME: Not sorted, but sorted() has problems with nan
-                # print(f"Total pontos classe {k} = {v}")
+            for k, v in fmic.sumPointsPerClassd.items(): 
                 fhand.write(f"\nTotal pontos classe {k} = {v} \n")
             fhand.write("------------------")
 
@@ -109,14 +112,12 @@ with pd.read_csv(datasetPath,
             summary['radius'].append(fmic.radius * 100000)
             summary['color'].append(color[max(fmic.tags, key=fmic.tags.get)])
             summary['weight'].append(fmic.m)
-            # TODO: Added by Asier
             summary['class'].append(max(fmic.tags, key=fmic.tags.get))
 
         if not os.path.isdir("./Img/"):
             os.mkdir("./Img/")
 
         fig = plt.figure()
-        # Plot radius
         plt.scatter('x', 'y', s='radius', color='color',
                     data=summary, alpha=0.1)
         # Plot centroids
@@ -128,7 +129,7 @@ with pd.read_csv(datasetPath,
         side_text = plt.figtext(.91, .8, metrics_summary)
         fig.subplots_adjust(top=1.0)
         # plt.show()
-        fig.savefig("./Img/KK[Chunk "+str(timestamp - 1000)+" to "+str(timestamp - 1)+"] Sim("+str(sm)+")_Thresh("+str(threshIDX)+").png", bbox_extra_artists=(side_text,), bbox_inches='tight')
+        fig.savefig("./Img/KK[Chunk "+str(timestamp - 1000)+" to "+str(timestamp - 1)+"] Sim("+str(sm)+")_Thresh("+str(thresh)+").png", bbox_extra_artists=(side_text,), bbox_inches='tight')
         plt.close()
 
 
@@ -143,7 +144,7 @@ with pd.read_csv(datasetPath,
 
     print("==== Approach ====")
     print("Similarity = ", sm)
-    print("Threshold = ", threshIDX)
+    print("Threshold = ", thresh)
     print("==== Summary ====")
     print(summary)
     print("==== Metrics ====")
@@ -154,7 +155,7 @@ with pd.read_csv(datasetPath,
 
     output = "\n==== Approach ===="
     output = output + str("\n Similarity ="+str(sm))
-    output = output + str("\n Threshold ="+str(threshIDX))
+    output = output + str("\n Threshold ="+str(thresh))
     output = output + str("\n ==== Summary ====")
     output = output + str("\n "+str(summary))
     output = output + str("\n ==== Metrics ====")
@@ -176,7 +177,7 @@ with pd.read_csv(datasetPath,
 
 
 
-with open('directOUTPUT.txt', 'a') as f:
+with open(output_path / 'directOUTPUT.txt', 'a') as f:
     f.write("\n------------------------------------------------------------")
 print("--- End of execution --- ")
 f.close()
@@ -205,25 +206,3 @@ for vi in final_clusters:
     ax0.plot(vi[0], vi[1], 'rs',  color='red')
 ax0.set_title('Clustering')
 
-
-# metrics.WFS(chunk[["X1","X2"]].values, final_clusters, np.ones(90), mu, alpha=1)
-'''
-Weighted Fuzzy Silhouette
-
-Parameters
-----------
-x : Array data points
-    DESCRIPTION.
-c : Cluster's centroids
-    DESCRIPTION.
-w : Weigths of examples
-    DESCRIPTION.
-mu : Membership matrix
-    DESCRIPTION.
-alpha : Fuzzy weighted coefficient
-    Default 1
-
-Returns
--------
-Float [0,1].
-'''
