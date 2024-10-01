@@ -3,13 +3,13 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import argparse
 import os
 import sys
-sys.path.append(os.path.abspath(os.path.join(".","..")))
+sys.path.append(os.path.abspath("."))
 from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import silhouette_samples, silhouette_score,adjusted_rand_score
-from src.d_fuzzstream import DFuzzStreamSummarizer
+from src.RE_dFuzzStream import REdFuzzStreamSummarizer
 from src.functions.merge import FuzzyDissimilarityMerger
 from src.functions.merge import AllMergers
 from src.functions.distance import EuclideanDistance
@@ -73,25 +73,24 @@ def experiment(dataset, chunksize=1000, min_fmics=5, max_fmics=100,start=0,end=0
         numChunks = 8
         chunksize = 100
         n_macro_clusters = 4
-    output_path = "".join(("./../output/", dataset, "/"))
-
-    currentdir = os.path.dirname(os.path.realpath(__file__))
-    parentdir = os.path.dirname(currentdir)
-    sys.path.append(parentdir)
+    
+    # currentdir = os.path.dirname(os.path.realpath(__file__))
+    # parentdir = os.path.dirname(currentdir)
+    # sys.path.append(parentdir)
+    output_path = Path.cwd() / "datasets" / dataset
     Path(output_path).mkdir(parents=True,exist_ok=True)
 
     df = pd.DataFrame(columns=['SimMeasure', 'Threshold', 'StartChunk',
                                'EndChunk', 'Creations', 'Absorptions', 'Removals',
                                'Merges', 'Purity', 'pCoefficient', 'pEntropy',
                                'XieBeni', 'MPC', 'FukuyamaSugeno_1',
-                               'FukuyamaSugeno_2', 'Silhouette'])  # 'ARI','Silhouette'])
+                               'FukuyamaSugeno_2', 'Silhouette'])  
     for simIDX in sm[start:end]:
         for thNum, threshIDX in enumerate(threshList):
-            summarizer = DFuzzStreamSummarizer(
+            summarizer = REdFuzzStreamSummarizer(
                 max_fmics=max_fmics,
                 distance_function=EuclideanDistance.distance,
                 merge_threshold=threshIDX,
-                # merge_function=FuzzyDissimilarityMerger(simIDX, threshIDX, max_fmics).merge,
                 merge_function=AllMergers[simIDX](simIDX, threshIDX, max_fmics),
                 membership_function=FuzzyCMeansMembership.memberships,
                 chunksize=chunksize,
@@ -140,7 +139,7 @@ def experiment(dataset, chunksize=1000, min_fmics=5, max_fmics=100,start=0,end=0
                     print(f"Offline silhouette for {timestamp}: {sil}")
                     print(f">> {timestamp},{sil:.5f},{ari:.5f}")
 
-                    # TODO: Obtain al metrics and create the row
+                    # Obtain al metrics and create the row
                     all_metrics = metrics.all_online_metrics(summarizer.summary(), chunksize)
                     metrics_summary = ""
                     for name, value in all_metrics.items():

@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
 
-from src.d_fuzzstream import DFuzzStreamSummarizer
+from src.RE_dFuzzStream import REdFuzzStreamSummarizer
 from src.functions.merge import FuzzyDissimilarityMerger
 from src.functions.merge import AllMergers
 from src.functions.distance import EuclideanDistance
@@ -49,11 +49,10 @@ def experiment(dataset, chunksize=1000, min_fmics=5, max_fmics=100,start=0,end=0
         numChunks = int(57_000 / chunksize)
         n_clusters = 6
 
-    currentdir = os.path.dirname(os.path.realpath(__file__))
-    parentdir = os.path.dirname(currentdir)
-    sys.path.append(parentdir)
-    currentPath = Path.cwd()
-    output_path = parentdir / "output"/ datasetName
+    # currentdir = os.path.dirname(os.path.realpath(__file__))
+    # parentdir = os.path.dirname(currentdir)
+    # sys.path.append(parentdir)
+    output_path = Path.cwd() / "output"/ dataset
     Path(output_path).mkdir(parents=True,exist_ok=True)
     
     tabRes = pd.DataFrame(np.zeros((32, (numChunks * 3) + 3)))
@@ -63,7 +62,7 @@ def experiment(dataset, chunksize=1000, min_fmics=5, max_fmics=100,start=0,end=0
         df = pd.DataFrame(columns=['Chunk', 'Purity', 'pCoefficient',
                                    'pEntropy', 'XieBeni', 'MPC',
                                    'FukuyamaSugeno_1', 'FukuyamaSugeno_2'])
-        summarizer = DFuzzStreamSummarizer(
+        summarizer = REdFuzzStreamSummarizer(
             max_fmics=max_fmics,
             distance_function=EuclideanDistance.distance,
             merge_threshold=threshIDX,
@@ -108,7 +107,7 @@ def experiment(dataset, chunksize=1000, min_fmics=5, max_fmics=100,start=0,end=0
                         print(om)
    
     
-                # TODO: Obtain al metrics and create the row
+                # Obtain al metrics and create the row
                 all_metrics = metrics.all_online_metrics(summarizer.summary(),
                                                          chunksize)
                 metrics_summary = ""
@@ -193,7 +192,7 @@ if __name__ == "__main__":
     parser.add_argument('--dataset', type=str, default='Benchmark1_11000',
                           help='Dataset: Benchmark1_11000 (d) or RBF1_40000')
 
-    parser.add_argument('--chunksize', type=int, default=10005,
+    parser.add_argument('--chunksize', type=int, default=1000,
                           help='Chunk size of the stream (d = 1000)')
 
     parser.add_argument('--min_fmics', type=int, default=5,
