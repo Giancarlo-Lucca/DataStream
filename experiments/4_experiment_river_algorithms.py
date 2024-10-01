@@ -7,11 +7,10 @@ Created on Thu Mar  7 14:59:50 2024
 """
 
 import argparse
-# import os
+import os
 import sys
-# sys.path.append(os.path.abspath(os.path.join("../scluster", "..")))
 from pathlib import Path
-sys.path.append(Path.cwd().parent)
+sys.path.append(os.path.abspath("."))
 import math
 import statistics
 from river import cluster
@@ -151,11 +150,9 @@ def run(algorithm, datasetPath, chunksize):
                     for XTest, YTest in zip(points, classes):
                         resultC = algorithm.predict_one(XTest)
                         YC.append(resultC)
-
                         Y.append(-1 if math.isnan(float(YTest.get("class"))) else YTest.get("class"))
 
                     ARI.append(adjusted_rand_score(Y, YC))
-                    print(ARI[-1])
 
                     classes = []
                     points = []

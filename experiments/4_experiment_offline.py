@@ -3,10 +3,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import os
 import sys
 from pathlib import Path
-print(Path.cwd())
-sys.path.append(Path.cwd().parent)
-sys.path.append(Path.cwd())
-sys.path.append("/home/au24677/DataStream")
+sys.path.append(os.path.abspath("."))
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -21,7 +18,7 @@ from src.functions import metrics
 
 def get_dataset_params(datasetName):
 
-    # datasetName :'Insects', 'RBF1_40000',  'Benchmark1_11000', 'Gaussian_4C2D800', 'Insects', 'PowerSupply'
+    # datasetName :'Insects', 'RBF1_40000',  'Benchmark1_11000', 'Gaussian_4C2D800', 'NOAA', 'PowerSupply'
 
     dataset_params = {}
 
@@ -34,6 +31,7 @@ def get_dataset_params(datasetName):
         dataset_params["chunksize"] = 1000
         dataset_params["n_clusters"] = 2
         dataset_params["max_fmics"] = 50
+        dataset_params["break_n"] = 11_000
     elif (datasetName == 'RBF1_40000'):
         # "https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/RBF1_40k/RBF1_40000.csv"
         dataset_params["datasetPath"] = Path("datasets","RBF1_40000.csv")
@@ -43,6 +41,7 @@ def get_dataset_params(datasetName):
         dataset_params["chunksize"] = 1000
         dataset_params["n_clusters"] = 3
         dataset_params["max_fmics"] = 100
+        dataset_params["break_n"] = 40_000
     elif (datasetName == 'Gaussian_4C2D800'):
         # https://gitlab.citius.usc.es/david.gonzalez.marquez/GaussianMotionData/-/raw/master/SamplesFile_b_4C2D800Linear.csv?ref_type=heads
         dataset_params["datasetPath"] = Path("datasets","DS1.csv")
@@ -52,6 +51,7 @@ def get_dataset_params(datasetName):
         dataset_params["chunksize"] = 100
         dataset_params["n_clusters"] = 4
         dataset_params["max_fmics"] = 100
+        dataset_params["break_n"] = 800
     elif (datasetName == 'Insects'):
         # https://gitlab.citius.usc.es/david.gonzalez.marquez/GaussianMotionData/-/raw/master/SamplesFile_b_4C2D800Linear.csv?ref_type=heads
         dataset_params["datasetPath"] = Path("datasets","INSECTS-incremental_balanced_norm.csv")

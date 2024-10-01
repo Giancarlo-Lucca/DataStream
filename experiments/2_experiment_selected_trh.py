@@ -6,9 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
-sys.path.append(Path.cwd().parent)
-sys.path.append(Path.cwd())
-sys.path.append(os.path.abspath( ".."))
+sys.path.append(os.path.abspath("."))
 from src.d_fuzzstream import DFuzzStreamSummarizer
 from src.functions.merge import FuzzyDissimilarityMerger
 from src.functions.merge import AllMergers
@@ -56,7 +54,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 currentPath = Path.cwd()
 output_path = currentPath / "output"/ datasetName
-Path(output_path).mkdir(exist_ok=True)
+Path(output_path).mkdir(parents=True,exist_ok=True)
 
 tabRes = pd.DataFrame(np.zeros((32, (numChunks * 3) + 3)))
 
@@ -82,7 +80,7 @@ for vecIndex, simIDX in enumerate(sm[start:end]):
     summary = {'x': [], 'y': [], 'radius': [], 'color': [], 'weight': [], 'class': []}
     timestamp = 0
 
-    fhand = open(f'{output_path}chunkFMICs.txt', 'a')
+    fhand = open(f'{output_path}/chunkFMICs.txt', 'a')
 
     # Read files in chunks
     with pd.read_csv(datasetPath,
@@ -142,7 +140,7 @@ for vecIndex, simIDX in enumerate(sm[start:end]):
                     # side_text = plt.figtext(.92, .5, te)
                     # fig.subplots_adjust(top=1.0)
                     # # plt.show()
-                    # fig_name = (f"{output_path}Img/MC[Chunk {timestamp - 1000} to "
+                    # fig_name = (f"{output_path}/Img/MC[Chunk {timestamp - 1000} to "
                     #             f"{timestamp - 1}] "
                     #             f"Sim({simIDX})_Thresh({threshIDX}).png")
                     # fig.savefig(fig_name,
@@ -240,13 +238,13 @@ for vecIndex, simIDX in enumerate(sm[start:end]):
         output = output + str("\n *****")
         df = df[0:0]
         # df.drop(df.index, inplace=True)
-        with open(f'{output_path}directOUTPUT.txt', 'a') as f:
+        with open(f'{output_path}/directOUTPUT.txt', 'a') as f:
             f.write(output)
 
 
     tabRes.to_excel(output_path / f"Example_Table_11K_08-04-1k-50F_{start}_{end}.xlsx")
 # tabRes.to_excel("./output/XieBeni_sm" + str(simIDX) + ".xlsx")
-with open(f'{output_path}directOUTPUT.txt', 'a') as f:
+with open(f'{output_path}/directOUTPUT.txt', 'a') as f:
     f.write("\n------------------------------------------------------------")
 print("--- End of execution --- ")
 

@@ -3,6 +3,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import os
 import sys
 from pathlib import Path
+sys.path.append(os.path.abspath("."))
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -73,12 +74,13 @@ elif (datasetName == 'Gaussian_4C2D800'):
     numChunks = 8
     chunksize = 100
     n_macro_clusters = 4
-output_path = "".join(("../output/", datasetName, "/"))
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
-Path(output_path).mkdir(exist_ok=True)
+currentPath = Path.cwd()
+output_path = currentPath / "output"/ datasetName
+Path(output_path).mkdir(parents=True,exist_ok=True)
 
 df = pd.DataFrame(columns=['SimMeasure', 'Threshold', 'StartChunk',
                            'EndChunk', 'Creations', 'Absorptions', 'Removals',
@@ -111,7 +113,7 @@ for simIDX in sm:
                 print(f"Summarizing examples from {timestamp} to {timestamp + chunksize - 1} -> sim {simIDX} and thrsh {threshIDX}")
                 for index, example in chunk.iterrows():
                     # Summarizing example
-                    summarizer.summarize(example[0:-1], int(example[-1]), timestamp)
+                    summarizer.summarize(example[0:-1], example[-1], timestamp)
                     timestamp += 1
 
                 ari, sil = metrics.offline_stats(summarizer, chunk)
@@ -149,29 +151,11 @@ for simIDX in sm:
                 for fmic in summarizer.summary():
                     # for k, v in fmic.sumPointsPerClassd.items():  # FIXME: Not sorted, but sorted() has problems with nan
                         # print(f"Total pontos classe {k} = {v}")
-
                     summary['x'].append(fmic.center.iloc[0])
                     summary['y'].append(fmic.center.iloc[1])
                     summary['radius'].append(fmic.radius * 100000)
                     summary['color'].append(color[max(fmic.tags, key=fmic.tags.get)])
                     summary['weight'].append(fmic.m)
-
-                if not os.path.isdir(f"{output_path}Img/"):
-                    os.mkdir(f"{output_path}Img/")
-
-                # fig = plt.figure()
-                # # Plot radius
-                # plt.scatter('x', 'y', s='radius', color='color', data=summary, alpha=0.1)
-                # # Plot centroids
-                # plt.scatter('x', 'y', s=1, color='color', data=summary)
-                # # plt.legend(["color blue", "color green"], loc ="lower right")
-                # # plt.legend(["Purity"+str(summarizer.Purity()),"PartitionCoefficient"+str(summarizer.PartitionCoefficient()),"PartitionEntropy"+str(summarizer.PartitionEntropy()),"XieBeni"+str(summarizer.XieBeni()), "FukuyamaSugeno_1"+str(summarizer.FukuyamaSugeno_1()),"FukuyamaSugeno_2"+str(summarizer.FukuyamaSugeno_2())], bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-                # plt.figtext(.8, .8, "T = 4K")
-                # side_text = plt.figtext(.91, .8, metrics_summary)
-                # fig.subplots_adjust(top=1.0)
-                # # plt.show()
-                # fig.savefig(f"f"{output_path}Img/[Chunk "+str(timestamp - chunksize)+" to "+str(timestamp - 1)+"] Sim("+str(simIDX)+")_Thresh("+str(threshIDX)+").png", bbox_extra_artists=(side_text,), bbox_inches='tight')
-                # plt.close()
 
 
             # Transforming FMiCs into dataframe
