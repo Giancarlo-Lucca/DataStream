@@ -7,9 +7,11 @@ Created on Thu Mar  7 14:59:50 2024
 """
 
 import argparse
-import os
+# import os
 import sys
-sys.path.append(os.path.abspath(os.path.join("../scluster", "..")))
+# sys.path.append(os.path.abspath(os.path.join("../scluster", "..")))
+from pathlib import Path
+sys.path.append(Path.cwd().parent)
 import math
 import statistics
 from river import cluster
@@ -28,7 +30,10 @@ def clu_stream_gen(n_classes, chunksize):
                 n_macro_clusters=n_classes,
                 max_micro_clusters=mmc,
                 time_gap=chunksize,
-                halflife=hl
+                time_window=chunksize,
+                halflife=hl,
+                mu=0.5,
+                sigma=0.25
             )
             yield clustream, [mmc, hl]
 
@@ -125,14 +130,15 @@ def run(algorithm, datasetPath, chunksize):
     points = []
     timestamp = 0
     with pd.read_csv(datasetPath,
-                     dtype={"X1": float, "X2": float, "class": str},
+                     dtype={ "class": str},
                      chunksize=chunksize) as reader:
         timestamp = 1
         for chunk in reader:
             # print(f"Summarizing examples from {timestamp} to {timestamp + chunksize - 1}")
             for index, example in chunk.iterrows():
-                X = example[["X1", "X2"]].to_dict()
-                C = example[["class"]].to_dict()
+                X = example[example.index[0:-1]].to_dict()
+                # C = example[["class"]].to_dict()
+                C = example[example.index[[-1]]].to_dict()
                 classes.append(C)
                 points.append(X)
                 # if timestamp==51:
@@ -149,6 +155,7 @@ def run(algorithm, datasetPath, chunksize):
                         Y.append(-1 if math.isnan(float(YTest.get("class"))) else YTest.get("class"))
 
                     ARI.append(adjusted_rand_score(Y, YC))
+                    print(ARI[-1])
 
                     classes = []
                     points = []
@@ -172,6 +179,22 @@ def main(algorithm, dataset):
         n_classes = 4
         chunksize = 100
         numChunks = 8
+    elif dataset == "INSECTS-incremental_balanced_norm":
+        n_classes = 6
+        chunksize = 3000
+        numChunks = 19
+    elif dataset == "powersupply":
+        n_classes = 24
+        chunksize = 1000
+        numChunks = 29
+    elif dataset == "NOAA":
+        n_classes = 2
+        chunksize = 1000
+        numChunks = 18
+    elif dataset == "sensors":
+        n_classes = 54
+        chunksize = 1000
+        numChunks = 2219
 
     if algorithm == "clustream":
         alg = clu_stream_gen
@@ -200,19 +223,15 @@ def main(algorithm, dataset):
     print(f"# {algorithm},{dataset},{best:.4f},{best_params=}")
 
     with open("../output/results_river_tune.csv", "a") as rfile:
-        rfile.write(f"# {algorithm},{dataset},{best:.4f},{best_params=}")
+        rfile.write(f"\n# {algorithm},{dataset},{best:.4f},{best_params=}")
 
 
 
 def main_all():
-    datasets = ["Benchmark1_11000","RBF1_40000","DS1"]
-
-    params = {
-        'converters': {'X': float, 'Y': float, 'C': int}
-    }
+    datasets = ["Benchmark1_11000","RBF1_40000","DS1","INSECTS-incremental_balanced_norm","powersupply"]
 
     for i, dataset in enumerate(datasets):
-        datasetPath = f"datasets/{dataset}.csv"
+        datasetPath = f"../datasets/{dataset}.csv"
 
 
         if i == 0:
@@ -247,7 +266,7 @@ def main_all():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Parameter parse of this project")
-    parser.add_argument('--dataset', type=str, default='Benchmark1_11000',
+    parser.add_argument('--dataset', type=str, default='INSECTS-incremental_balanced_norm',
                         help='Dataset: Benchmark1_11000 (d) or RBF1_40000')
 
     parser.add_argument('--algorithm', type=str, default="clustream",

@@ -111,7 +111,7 @@ for simIDX in sm:
                 print(f"Summarizing examples from {timestamp} to {timestamp + chunksize - 1} -> sim {simIDX} and thrsh {threshIDX}")
                 for index, example in chunk.iterrows():
                     # Summarizing example
-                    summarizer.summarize(example[0:2], int(example[2]), timestamp)
+                    summarizer.summarize(example[0:-1], int(example[-1]), timestamp)
                     timestamp += 1
 
                 ari, sil = metrics.offline_stats(summarizer, chunk)

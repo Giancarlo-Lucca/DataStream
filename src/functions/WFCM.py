@@ -35,7 +35,7 @@ def FCM(data, c, m=2, epsilon=0.001):
     return V
 
 
-def WFCM(data, weights, c, m=2, epsilon=0.001):
+def WFCM(data, weights, c, m=2, epsilon=0.001, it_max=300):
     '''
     Weighted Fuzzy c-means
 
@@ -51,6 +51,8 @@ def WFCM(data, weights, c, m=2, epsilon=0.001):
          Fuzzy ... The default is 2.
     epsilon : float, optional
         Threshold for change in J. The default is 0.001.
+    it_max: int, optional
+        Maximum number of iterations
 
     Returns
     -------
@@ -75,13 +77,14 @@ def WFCM(data, weights, c, m=2, epsilon=0.001):
     D = np.zeros([c, n])
     J = 0
     newJ = 1
+    it = 0
 
-    while abs(newJ-J) > epsilon:
+    while (abs(newJ-J) > epsilon) and (it<it_max):
         J = newJ
         # Step2: compute V
-        for i in range(c):
-            for j in range(s):
-                V[i, j] = sum(weights[j] * (U[i, :]**2) * x[:, j])/sum(weights[j] * U[i, :]**2)  # * weigths[k]
+        for i in range(c):  # For each center
+                for j in range(s): # for each attribute
+                    V[i, j] = sum(weights[:] * (U[i, :]**2) * x[:, j])/sum(weights[:] * U[i, :]**2)  # * weigths[k]
 
         # Step3: compute D and U
         for i in range(c):
@@ -98,6 +101,7 @@ def WFCM(data, weights, c, m=2, epsilon=0.001):
 
         # Step4: compute J
         newJ = np.sum((U**m)*(D**2))
+        it += 1
     return V, U
 
 

@@ -11,7 +11,7 @@ https://pythonhosted.org/scikit-fuzzy/auto_examples/plot_cmeans.html
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from functions.WFCM import FCM
+from WFCM import FCM
 
 
 colors = ['b', 'orange', 'g', 'r', 'c', 'm', 'y', 'k', 'Brown', 'ForestGreen']
@@ -54,3 +54,5 @@ for c in range(2, 11):
     for vi in V:
         ax0.plot(vi[0], vi[1], 'rs',  color='red')
     ax0.set_title(f'Test data: 200 points x3 clusters. and {c} centers')
+
+fig0.show()
