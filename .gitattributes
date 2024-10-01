@@ -1,0 +1,10 @@
+datasets/Not[[:space:]]used/sensor.arff filter=lfs diff=lfs merge=lfs -text
+datasets/Not[[:space:]]used/sensor.csv filter=lfs diff=lfs merge=lfs -text
+datasets/Not[[:space:]]used/sensor.mat filter=lfs diff=lfs merge=lfs -text
+datasets/Not[[:space:]]used/sensor_norm.csv filter=lfs diff=lfs merge=lfs -text
+datasets/Not[[:space:]]used/covertype2.csv filter=lfs diff=lfs merge=lfs -text
+datasets/Not[[:space:]]used/covertype.csv filter=lfs diff=lfs merge=lfs -text
+datasets/Not[[:space:]]used/covertype_csv.csv filter=lfs diff=lfs merge=lfs -text
+datasets/Not[[:space:]]used/INSECTS-incremental_balanced_norm.arff filter=lfs diff=lfs merge=lfs -text
+datasets/Not[[:space:]]used/INSECTS-incremental_balanced_norm.csv filter=lfs diff=lfs merge=lfs -text
+datasets/Not[[:space:]]used/rotatingHyperplane..* filter=lfs diff=lfs merge=lfs -text
