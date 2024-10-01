@@ -140,8 +140,6 @@ def run(algorithm, datasetPath, chunksize):
                 C = example[example.index[[-1]]].to_dict()
                 classes.append(C)
                 points.append(X)
-                # if timestamp==51:
-                #     print(timestamp, X)
                 algorithm.learn_one(X)
 
                 if timestamp % chunksize == 0:
