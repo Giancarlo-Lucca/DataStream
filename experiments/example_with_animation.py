@@ -1,37 +1,33 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
-
+from pathlib import Path
 import os, sys
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
+sys.path.append(os.path.abspath("."))
 
-from src.d_fuzzstream import DFuzzStreamSummarizer
-from src.functions.merge import FuzzyDissimilarityMerger
+from src.RE_dFuzzStream import REdFuzzStreamSummarizer
+from src.functions.merge import AllMergers
 from src.functions.distance import EuclideanDistance
 from src.functions.membership import FuzzyCMeansMembership
 
-idxSimilarity = 5
-min_fmics = 5
+sm = 5
+thresh = 0.8
 max_fmics = 100
-thresh = 1.2
+datasetPath = Path.cwd() / "datasets"/ "Benchmark1_11000.csv"
+chunk_size = 1000
 
-
-
-summarizer = DFuzzStreamSummarizer(
+summarizer = REdFuzzStreamSummarizer(
     distance_function=EuclideanDistance.distance,
     merge_threshold = thresh,
-    merge_function=FuzzyDissimilarityMerger(idxSimilarity,thresh, max_fmics).merge,
+    merge_function=AllMergers[sm](sm, thresh, max_fmics),
     membership_function=FuzzyCMeansMembership.memberships,
 )
 
-chunk_size = 1000
 figure = plt.figure()
 scatter = plt.scatter('x', 'y', s='radius', data={'x': [], 'y': [], 'radius': []})
 
 # Read files in chunks
-csv = pd.read_csv("https://raw.githubusercontent.com/CIG-UFSCar/DS_Datasets/master/Synthetic/Non-Stationary/Bench1_11k/Benchmark1_11000.csv",
+csv = pd.read_csv(datasetPath,
                   dtype={"X1": float, "X2": float, "class": str},
                   chunksize=chunk_size)
 
@@ -50,7 +46,7 @@ def summarize(frame):
     print(f"Summarizing examples from {timestamp} to {timestamp + chunk_size - 1}")
     for index, example in chunk.iterrows():
         # Summarizing example
-        summarizer.summarize(example[0:2], example[2], timestamp)
+        summarizer.summarize(example[0:-1], example[-1], timestamp)
         timestamp += 1
 
     data = {'x': [], 'y': [], 'radius': [], 'color': []}
@@ -58,7 +54,7 @@ def summarize(frame):
     for fmic in summarizer.summary():
         data['x'].append(fmic.center[0])
         data['y'].append(fmic.center[1])
-        data['radius'].append(fmic.radius * 100000)
+        data['radius'].append(fmic.radius * 1000)
         data['color'].append(color[max(fmic.tags, key=fmic.tags.get)])
     # Plot radius
     plt.scatter('x', 'y', s='radius', color='color', data=data, alpha=0.1)
@@ -77,7 +73,7 @@ anim = FuncAnimation(
 
 writer_gif = PillowWriter(fps=1)
 
-anim.save("summary_sm_"+str(idxSimilarity)+"th_"+str(thresh)+".gif", writer=writer_gif)
+anim.save("output/summary_sm_"+str(idxSimilarity)+"th_"+str(thresh)+".gif", writer=writer_gif)
 
 plt.close()
 csv.close()
